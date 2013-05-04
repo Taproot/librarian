@@ -16,13 +16,14 @@ class FilesystemCrudListener implements EventDispatcher\EventSubscriberInterface
 	public static function getSubscribedEvents() {
 		return [
 			Events::PUT_EVENT => [
-				['saveToFilesystem', 0],
-				['setEventItemId', 20]
+				['saveToFilesystem', 0], // Save the serialized data to a file
+				['setEventItemId', 500] // Get the ID out from the data whilst it’s an array
 			],
 			Events::GET_EVENT => [
-				['getFromFilesystem', 0],
-				['setEventItemId', -20]
-			]
+				['getFromFilesystem', 0], // Get the raw data from the file
+				['setEventItemId', -500] // Once the data’s been unserialized, get the ID out
+			],
+			Events::DELETE_EVENT => 'deleteFromFilesystem'
 		];
 	}
 	
@@ -58,6 +59,11 @@ class FilesystemCrudListener implements EventDispatcher\EventSubscriberInterface
 			throw new CrudException('Couldn’t fetch file "' . $this->pathForId($id) . '"');
 		else
 			$event->setData($data);
+	}
+	
+	public function deleteFromFilesystem(CrudEvent $event) {
+		$id = $event->getData();
+		unlink($this->pathForId($id));
 	}
 	
 	private function pathForId($id) {

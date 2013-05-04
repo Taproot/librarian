@@ -10,8 +10,8 @@ use Taproot\Librarian as L;
 class JsonListener implements EventDispatcher\EventSubscriberInterface {
 	public static function getSubscribedEvents() {
 		return [
-			Events::PUT_EVENT => ['encodeJson', 10],
-			Events::GET_EVENT => ['decodeJson', -10]
+			Events::PUT_EVENT => ['encodeJson', 10], // Encode the array as JSON before saving
+			Events::GET_EVENT => ['decodeJson', -10] // Decode the array from JSON before returning
 		];
 	}
 	
