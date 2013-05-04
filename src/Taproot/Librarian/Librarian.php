@@ -2,6 +2,6 @@
 
 namespace Taproot\Librarian;
 
-class Librarian {
+class Librarian implements LibrarianInterface {
 	
 }
