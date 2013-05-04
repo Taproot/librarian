@@ -30,7 +30,7 @@ class FilesystemCrudListener implements EventDispatcher\EventSubscriberInterface
 	public function __construct(array $config) {
 		$this->path = rtrim($config['path'], '/') . DIRECTORY_SEPARATOR;
 		$this->idField = $config['idField'];
-		$this->extension =ltrim($config['extension'], '.');
+		$this->extension = ltrim($config['extension'], '.');
 	}
 	
 	public function setEventItemId(CrudEvent $event) {
