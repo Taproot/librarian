@@ -17,9 +17,12 @@ class FilesystemCrudListener implements EventDispatcher\EventSubscriberInterface
 		return [
 			Events::PUT_EVENT => [
 				['saveToFilesystem', 0],
-				['determineSaveItemId', 20]
+				['setEventItemId', 20]
 			],
-			Events::GET_EVENT => ['getFromFilesystem', 0]
+			Events::GET_EVENT => [
+				['getFromFilesystem', 0],
+				['setEventItemId', -20]
+			]
 		];
 	}
 	
@@ -29,7 +32,7 @@ class FilesystemCrudListener implements EventDispatcher\EventSubscriberInterface
 		$this->extension =ltrim($config['extension'], '.');
 	}
 	
-	public function determineSaveItemId(CrudEvent $event) {
+	public function setEventItemId(CrudEvent $event) {
 		$data = $event->getData();
 		$event->setId($data[$this->idField]);
 	}
