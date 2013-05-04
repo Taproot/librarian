@@ -18,9 +18,8 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 			'name' => 'The Test Data'
 		];
 		
-		$this->l->put($data);
-		
 		try {
+			$this->l->put($data);
 			$result = $this->l->get('1');
 		} catch (L\CrudException $e) {
 			$this->fail('Got a CrudException with message "' . $e->getMessage() . '"');
