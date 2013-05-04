@@ -50,10 +50,7 @@ class Librarian implements LibrarianInterface {
 		$event = new CrudEvent($method, $data, $this);
 		$this->dispatcher->dispatch($eventName, $event);
 		
-		if ($event->hasResult())
-			return $event->getResult();
-		else
-			throw new CrudException();
+		return $event->getData();
 	}
 	
 	public function query($limit = 20, $orderBy = []) {

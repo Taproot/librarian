@@ -5,9 +5,9 @@ namespace Taproot\Librarian;
 use Symfony\Component\EventDispatcher;
 
 class CrudEvent extends EventDispatcher\Event {
-	private $result = null;
 	private $method;
 	private $data;
+	private $id;
 	private $librarian;
 	
 	public function __construct($method, $data, LibrarianInterface $librarian) {
@@ -15,16 +15,19 @@ class CrudEvent extends EventDispatcher\Event {
 		$this->data = $data;
 		$this->librarian = $librarian;
 	}
-	
-	public function hasResult() {
-		return !empty($this->result);
+	public function getData() {
+		return $this->data;
 	}
 	
-	public function getResult() {
-		return $this->result;
+	public function setData($data) {
+		$this->data = $data;
 	}
 	
-	public function setResult($data) {
-		$this->result = $data;
+	public function getId() {
+		return $this->id;
+	}
+	
+	public function setId($id) {
+		$this->id = $id;
 	}
 }
