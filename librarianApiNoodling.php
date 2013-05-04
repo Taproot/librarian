@@ -1,6 +1,11 @@
 <?php
 
 // # Librarian API Codestorming
+// 
+// Much of these will probably become acceptance tests for Librarian.
+// For the moment it’s a place to write a lot of how Librarian might work, preferably
+// using real-world, existing problems, and to play with the API, seeing where we
+// can simplify, where we can automate, which things can be convention over configuration
 
 use Taproot\Librarian\Librarian;
 use Taproot\Librarian\Index
@@ -17,7 +22,7 @@ $l->addIndexes([
 	'tagged' => new Index\TaggedIndex(),
 	'published' => new Index\DateTimeIndex('published'),
 	'mentioning' => new Index\MentioningIndex('content'),
-	'location' => new Index\LocationIndex('tags', ['machineTagNamespace' => 'geo'])
+	'located' => new Index\LocatedIndex('tags', ['machineTagNamespace' => 'geo'])
 ]);
 
 // Builds and executes any SQL required for the environment to be as defined so far
@@ -55,12 +60,36 @@ $foodieNotes = $l->query(20, $orderBy=['published' => 'newestFirst'])
 
 // Get last 20 notes before 2013-01-07 12:00:00
 // Would also accept a DateTime or Carbon instance
-$birthdayAnticipationNotes = $l->query(20, $orderBy['published' => 'newestFirst'])
+$eighteenthBirthdayAnticipationNotes = $l->query(20, $orderBy['published' => 'newestFirst'])
 	->published->before('2013-01-07 12:00:00')
 	->fetch();
 
-// Get closest 20 notes to a particular location
+// Datetime before/after permalink pagination
+// Rev. chrono, ?before=datetime
+$pageTwoFromPageOneNotes = $l->query(20, $orderBy['published' => 'newestFirst'])
+	->published->before('Date of last note on page 1')
+	->fetch();
+
+// Chrono order, ?after=datetime
+$pageThreeFromPageFourNotes = $l->query(20, $orderBy['published' => 'newestFirst'])
+	->published->after('Date of first note on page four')
+	->fetch();
+
+// Get closest 20 notes to a particular location, within a particular radius
+// TODO: duplication of lat/long data — how to deal with this?
+//  - Infer one from the other? Which takes precedence?
 $cafeStofanNotes = $l->query(20, $orderBy[
 	'location' => ['closestTo' => ['lat', 'long']],
 	'published' => 'newestFirst')
+	->located->withinRadiusOfPoint(1000, 'lat', 'long')
 	->fetch();
+
+// Then, on the object returned by ->fetch():
+
+count($cafeStofanNotes); // => number of results in this query
+$cafeStofanNotes->totalCount() // (maybe, lazy) => total number of results matching non-pagination query
+
+foreach ($cafeStofanNotes as $note) {
+	// Do something with each note
+	// Perhaps calculate the distance from lat, long as it isn’t returned in the query
+}
