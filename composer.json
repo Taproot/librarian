@@ -1,0 +1,14 @@
+{
+    "name": "taproot/librarian",
+    "description": "An event-driven flat file CRUD system with Doctrine DBAL based indexes",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Barnaby Walters",
+            "email": "barnaby@waterpigs.co.uk"
+        }
+    ],
+    "require": {
+
+    }
+}
