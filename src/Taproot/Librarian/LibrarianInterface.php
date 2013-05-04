@@ -3,6 +3,10 @@
 namespace Taproot\Librarian;
 
 interface LibrarianInterface {
+	const GET_EVENT = 'crud.get';
+	const PUT_EVENT = 'crud.put';
+	const DELETE_EVENT = 'crud.delete';
+	
 	/**
 	 * Constructor
 	 */
