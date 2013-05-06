@@ -31,6 +31,8 @@ $l->addIndexes([
 $l->buildEnvironment();
 
 // Iterates through notes/indexes, building all the indexes for the content
+// Perhaps we store the lastIndexed timestamp and compare it to the file last modified
+// time to only rebuild indexes for files which have changed or are unindexed
 $l->buildIndexes();
 
 // Gets the item array for an id, throws an exception if it doesn’t exist
@@ -43,6 +45,7 @@ $l->put([
 ]);
 
 // Deletes an item
+// TODO: what to return here?
 $l->delete('id');
 
 // ## Indexed, Paged, Multiple Queries
