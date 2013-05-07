@@ -91,4 +91,18 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 			$this->fail('Got a CrudException with message "' . $e->getMessage() . '"');
 		}
 	}
+	
+	public function testBuildEnvironmentCausesPathFolderToBeCreated() {
+		rmdir($this->path);
+		
+		$this->assertFileNotExists($this->path);
+		
+		$this->l->buildEnvironment();
+		
+		$this->assertFileExists($this->path);
+	}
+	
+	public function testBuildEnvironmentCreatesIndexTables() {
+		
+	}
 }

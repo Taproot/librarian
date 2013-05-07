@@ -6,16 +6,12 @@ interface LibrarianInterface {
 	const GET_EVENT = 'crud.get';
 	const PUT_EVENT = 'crud.put';
 	const DELETE_EVENT = 'crud.delete';
+	const BUILD_ENVIRONMENT_EVENT = 'environment.build';
 	
 	/**
 	 * Constructor
 	 */
-	public function __construct($namespace, array $config = []);
-	
-	/**
-	 * Add Indexes
-	 */
-	public function addIndexes(array $indexes);
+	public function __construct($namespace, array $config = [], array $indexes = []);
 	
 	/**
 	 * Build Environment

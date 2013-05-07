@@ -15,19 +15,21 @@ class Librarian implements LibrarianInterface {
 	/** @var Log\LoggerInterface **/
 	public $logger;
 	
-	public function __construct($namespace, array $config = []) {
+	/** @var array IndexInterface **/
+	private $indexes = [];
+	
+	public function __construct($namespace, array $config = [], array $indexes = []) {
 		$this->namespace = $namespace;
+		
+		$this->indexes = $indexes;
 		
 		$this->dispatcher = new EventDispatcher\EventDispatcher();
 		$this->logger = new Log\NullLogger();
 	}
 	
-	public function addIndexes(array $indexes) {
-		
-	}
-	
 	public function buildEnvironment() {
-		
+		$event = new Event($this);
+		$this->dispatcher->dispatch(self::BUILD_ENVIRONMENT_EVENT, $event);
 	}
 	
 	public function buildIndexes() {

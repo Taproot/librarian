@@ -12,13 +12,11 @@ use Taproot\Librarian\Index
 
 // ## Setup
 
-$l = new Librarian('notes', [
+$l = new Librarian('notes', $config = [
 	'idField' => 'id',
 	'path' => '/blah/blah/notes',
 	'db' => 'info'
-]);
-
-$l->addIndexes([
+], $indexes = [
 	'tagged' => new Index\TaggedIndex(),
 	'published' => new Index\DateTimeIndex('published'),
 	'mentioning' => new Index\MentioningIndex('content'),

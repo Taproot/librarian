@@ -2,9 +2,7 @@
 
 namespace Taproot\Librarian;
 
-use Symfony\Component\EventDispatcher;
-
-class CrudEvent extends EventDispatcher\Event {
+class CrudEvent extends Event {
 	private $method;
 	private $data;
 	private $id;

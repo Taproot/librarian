@@ -4,6 +4,7 @@ namespace Taproot\Librarian\Listener;
 
 use Taproot\Librarian\CrudException;
 use Taproot\Librarian\CrudEvent;
+use Taproot\Librarian\Event;
 use Taproot\Librarian\LibrarianInterface as Events;
 use Symfony\Component\EventDispatcher;
 use SplFileObject as File;
@@ -23,7 +24,8 @@ class FilesystemCrudListener implements EventDispatcher\EventSubscriberInterface
 				['getFromFilesystem', 0], // Get the raw data from the file
 				['setEventItemId', -500] // Once the data’s been unserialized, get the ID out
 			],
-			Events::DELETE_EVENT => 'deleteFromFilesystem'
+			Events::DELETE_EVENT => 'deleteFromFilesystem',
+			Events::BUILD_ENVIRONMENT_EVENT => 'ensurePathExists'
 		];
 	}
 	
@@ -31,6 +33,10 @@ class FilesystemCrudListener implements EventDispatcher\EventSubscriberInterface
 		$this->path = rtrim($config['path'], '/') . DIRECTORY_SEPARATOR;
 		$this->idField = $config['idField'];
 		$this->extension = ltrim($config['extension'], '.');
+	}
+	
+	public function getPath() {
+		return $this->path;
 	}
 	
 	public function setEventItemId(CrudEvent $event) {
@@ -68,5 +74,10 @@ class FilesystemCrudListener implements EventDispatcher\EventSubscriberInterface
 	
 	private function pathForId($id) {
 		return $this->path . $id . '.' . $this->extension;
+	}
+	
+	public function ensurePathExists(Event $event = null) {
+		if (!file_exists($this->path . '.'))
+			mkdir($this->path, 0777, true);
 	}
 }
