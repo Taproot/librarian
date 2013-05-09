@@ -197,7 +197,10 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		
 		$docs = $this->l->query(20, $orderBy=['published' => 'newestFirst'])->fetch();
 		
-		assert(is_array($docs));
-		$this->assertEquals([2, 3, 1], array_map(function($i) { return $i['id']; }, $docs));
+		$this->assertEquals([2, 3, 1], $docs->getIds());
+		
+		$doc = $docs[0];
+		
+		$this->assertEquals($doc['id'], 2);
 	}
 }

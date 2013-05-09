@@ -10,8 +10,10 @@ class Query {
 	private $db;
 	private $limit;
 	private $queryBuilder;
+	private $librarian;
 	
-	public function __construct($db, $limit, $orderBy, $indexes) {
+	public function __construct($librarian, $db, $limit, $orderBy, $indexes) {
+		$this->librarian = $librarian;
 		$this->indexes = $indexes;
 		$this->db = $db;
 		$this->limit = $limit;
@@ -44,7 +46,10 @@ class Query {
 	}
 	
 	public function fetch() {
-		return $this->queryBuilder->execute()->fetchAll();
+		return new DocumentCollection(array_map(function ($item) {
+			return $item['id'];
+		}, $this->queryBuilder->execute()->fetchAll())
+		, $this->librarian);
 	}
 	
 	public function __isset($id) {

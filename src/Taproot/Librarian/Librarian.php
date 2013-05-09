@@ -135,12 +135,12 @@ class Librarian implements LibrarianInterface {
 		return $event->getData();
 	}
 	
-	// TODO: write
+	
 	public function query($limit = 20, $orderBy = []) {
 		foreach ($this->indexes as $index) {
 			$queryIndexes[$index->getName()] = $index->getQueryIndex();
 		}
 		
-		return new Query($this->db, 20, $orderBy, $queryIndexes);
+		return new Query($this, $this->db, 20, $orderBy, $queryIndexes);
 	}
 }
