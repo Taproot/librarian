@@ -195,12 +195,46 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 			'published' => new DateTime('2013-05-03 12:00:00')
 		]);
 		
-		$docs = $this->l->query(20, $orderBy=['published' => 'newestFirst'])->fetch();
+		$docs = $this->l->query(20, $orderBy = ['published' => 'newestFirst'])->fetch();
 		
 		$this->assertEquals([2, 3, 1], $docs->getIds());
 		
 		$doc = $docs[0];
 		
 		$this->assertEquals($doc['id'], 2);
+	}
+	
+	public function testDateTimeBeforeAfterPagination() {
+		$this->l->put([
+			'id' => 1,
+			'published' => new DateTime('2013-05-01 12:00:00')
+		]);
+		
+		$this->l->put([
+			'id' => 2,
+			'published' => new DateTime('2013-05-03 12:00:00')
+		]);
+		
+		$this->l->put([
+			'id' => 3,
+			'published' => new DateTime('2013-05-05 12:00:00')
+		]);
+		
+		$this->l->put([
+			'id' => 4,
+			'published' => new DateTime('2013-05-06 12:00:00')
+		]);
+		
+		$docs = $this->l->query(2, $orderBy = ['published' => 'newestFirst'])
+			->published->before('2013-05-06 13:00:00')
+			->fetch();
+		
+		$this->assertEquals([4, 3], $docs->getIds());
+		
+		$docs = $this->l->query(2, $orderBy = ['published' => 'newestFirst'])
+			->published->after('2013-05-02 12:00:00')
+			->fetch();
+		
+		$this->assertEquals([2, 3], $docs->getIds());
 	}
 }

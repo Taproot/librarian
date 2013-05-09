@@ -12,7 +12,7 @@ abstract class AbstractQueryIndex {
 	}
 	
 	final public function fetch() {
-		return call_user_func_args([$this->query, 'fetch'], func_get_args());
+		return call_user_func_array([$this->query, 'fetch'], func_get_args());
 	}
 	
 	final public function __get($id) {

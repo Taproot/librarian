@@ -19,6 +19,7 @@ class Query {
 		$this->limit = $limit;
 		
 		$this->queryBuilder = $this->db->createQueryBuilder();
+		$this->queryBuilder->setMaxResults($limit);
 		$first = true;
 		
 		foreach ($this->indexes as $name => $index) {

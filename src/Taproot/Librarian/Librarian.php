@@ -141,6 +141,6 @@ class Librarian implements LibrarianInterface {
 			$queryIndexes[$index->getName()] = $index->getQueryIndex();
 		}
 		
-		return new Query($this, $this->db, 20, $orderBy, $queryIndexes);
+		return new Query($this, $this->db, $limit, $orderBy, $queryIndexes);
 	}
 }
