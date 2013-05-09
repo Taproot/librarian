@@ -10,9 +10,13 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 	private $l;
 	private $path;
 	
+	public static function setUpBeforeClass() {
+		date_default_timezone_set('UTC');
+	}
+	
 	public function setUp() {
 		parent::setUp();
-		$this->path = __DIR__ . '/../../tmp_test_data/';
+		$this->path = realpath(__DIR__ . '/../../') . '/tmp_test_data/';
 		
 		$this->l = new L\Librarian('test', [
 			'db' => [
@@ -105,6 +109,10 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 	}
 	
 	public function testBuildEnvironmentCausesPathFolderToBeCreated() {
+		foreach (glob($this->path . '*') as $path) {
+			unlink($path);
+		}
+		
 		rmdir($this->path);
 		
 		$this->assertFileNotExists($this->path);
@@ -138,8 +146,6 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 	
 	// TODO: split this up into multiple tests
 	public function testBuildIndexesAddsRowForExistingDocument() {
-		date_default_timezone_set('UTC');
-		
 		$this->l->put([
 			'id' => 1,
 			'published' => new DateTime('2013-05-09 09:42:29')
@@ -171,5 +177,27 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		
 		$rows = $db->executeQuery('select last_indexed from test_datetime_index_published_on_published where id = "1"')->fetch();
 		$this->assertNotEquals($lastIndexed, $rows['last_indexed']);
+	}
+	
+	public function testDateTimeQueryOrderBy() {
+		$this->l->put([
+			'id' => 1,
+			'published' => new DateTime('2013-05-01 12:00:00')
+		]);
+		
+		$this->l->put([
+			'id' => 2,
+			'published' => new DateTime('2013-05-05 12:00:00')
+		]);
+		
+		$this->l->put([
+			'id' => 3,
+			'published' => new DateTime('2013-05-03 12:00:00')
+		]);
+		
+		$docs = $this->l->query(20, $orderBy=['published' => 'newestFirst'])->fetch();
+		
+		assert(is_array($docs));
+		$this->assertEquals([2, 3, 1], array_map(function($i) { return $i['id']; }, $docs));
 	}
 }

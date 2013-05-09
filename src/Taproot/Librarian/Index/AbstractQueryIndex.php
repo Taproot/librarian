@@ -7,8 +7,7 @@ use Taproot\Librarian\Query;
 abstract class AbstractQueryIndex {
 	private $query;
 	
-	// TODO: possibly pass Librarian instance here too?
-	public function __construct(Query $query) {
+	final public function setQuery(Query $query) {
 		$this->query = $query;
 	}
 	

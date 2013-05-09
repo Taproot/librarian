@@ -46,6 +46,10 @@ class DateTimeIndex implements IndexInterface {
 		return $this->name;
 	}
 	
+	public function getQueryIndex() {
+		return new DateTimeQueryIndex($this, $this->db);
+	}
+	
 	public function getTableName() {
 		return $this->librarian->namespace . '_datetime_index_' . $this->name . '_on_' . $this->propertyName;
 	}
@@ -128,8 +132,43 @@ class DateTimeIndex implements IndexInterface {
 	}
 }
 
-class DateTimeIndexQuery extends AbstractQueryIndex implements OrderableIndexInterface {
+class DateTimeQueryIndex extends AbstractQueryIndex implements OrderableIndexInterface {
+	protected $index;
+	protected $queryBuilder;
+	protected $db;
+	
+	public function __construct($index, $db) {
+		$this->index = $index;
+		$this->db = $db;
+	}
+	
+	public function getTableName() {
+		return $this->index->getTableName();
+	}
+	
+	public function setQueryBuilder($b) {
+		$this->queryBuilder = $b;
+	}
+	
 	public function orderBy($direction) {
+		if (in_array(strtolower($direction), ['desc', 'newestfirst', 'reverse']))
+			$direction = 'desc';
+		else
+			$direction = 'asc';
 		
+		$this->queryBuilder->orderBy($this->db->quoteIdentifier($this->index->getName()) . '.datetime',
+			$direction);
+	}
+	
+	public function before($datetime) {
+	
+	}
+	
+	public function after($datetime) {
+		
+	}
+	
+	public function between($after, $before) {
+		return $this->after($after)->before($before);
 	}
 }

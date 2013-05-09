@@ -5,7 +5,7 @@
 select distinct p.id
 	from datetime_published as p
 		left outer join tagged as t using(id)
-    left outer join mentioning as m using (id)
+    left outer join mentioning as m using(id)
 	order by p.published desc
 
 -- We can then add where clauses for any of the index tables

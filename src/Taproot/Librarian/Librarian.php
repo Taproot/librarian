@@ -137,6 +137,10 @@ class Librarian implements LibrarianInterface {
 	
 	// TODO: write
 	public function query($limit = 20, $orderBy = []) {
+		foreach ($this->indexes as $index) {
+			$queryIndexes[$index->getName()] = $index->getQueryIndex();
+		}
 		
+		return new Query($this->db, 20, $orderBy, $queryIndexes);
 	}
 }
