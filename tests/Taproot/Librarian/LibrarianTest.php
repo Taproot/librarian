@@ -16,8 +16,11 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		
 		$this->l = new L\Librarian('test', [
 			'db' => [
-				'path' => realpath(rtrim($this->path, '/') . '/indexes.sq3'),
-				'driver' => 'pdo_sqlite'
+				'name' => 'waterpigs_co_uk_test',
+				'username' => 'test',
+				'password' => 'test',
+				'host' => '127.0.0.1',
+				'driver' => 'pdo_mysql'
 			]
 		],
 		['published' => new Index\DateTimeIndex('published')]);
@@ -113,6 +116,9 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 	
 	public function testBuildEnvironmentCreatesIndexTables() {
 		$db = $this->l->getConn();
+		
+		$db->executeQuery('DROP TABLE IF EXISTS test_datetime_index_published_on_published');
+		
 		$s = $db->getSchemaManager()->createSchema();
 		
 		$this->assertFalse($s->hasTable('test_datetime_index_published_on_published'));
@@ -121,8 +127,9 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		
 		// Update schema representation
 		$s = $db->getSchemaManager()->createSchema();
-		$this->assertTrue($s->hasTable('test_datetime_index_published_on_published'));
+		
 		$this->assertGreaterThanOrEqual(1, $queriesExecuted);
+		$this->assertTrue($s->hasTable('test_datetime_index_published_on_published'));
 		
 		// Assert applying no diffs executes no queries
 		$queriesExecuted = $this->l->buildEnvironment();

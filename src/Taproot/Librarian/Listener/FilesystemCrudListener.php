@@ -9,6 +9,7 @@ use Taproot\Librarian\LibrarianInterface as Events;
 use Symfony\Component\EventDispatcher;
 use SplFileObject as File;
 
+// TODO: write CrudHandlerInterface, stick a bunch of these methods on it
 class FilesystemCrudListener implements EventDispatcher\EventSubscriberInterface {
 	private $path;
 	private $extension;
@@ -44,11 +45,11 @@ class FilesystemCrudListener implements EventDispatcher\EventSubscriberInterface
 		$paths = [];
 		
 		while (($entry = readdir($dir)) !== false) {
-			$path = $this->path . $entry;
+			$path = realpath($this->path . $entry);
 			if ($entry == '.' or $entry == '..' or is_dir($path))
 				continue;
 			
-			$paths[] = $entry;
+			$paths[$this->idForFilename($entry)] = $path;
 		}
 		
 		closedir($dir);
@@ -88,8 +89,12 @@ class FilesystemCrudListener implements EventDispatcher\EventSubscriberInterface
 		unlink($this->pathForId($id));
 	}
 	
-	private function pathForId($id) {
+	protected function pathForId($id) {
 		return $this->path . $id . '.' . $this->extension;
+	}
+	
+	protected function idForFilename($name) {
+		return pathinfo($name, PATHINFO_FILENAME);
 	}
 	
 	public function ensurePathExists(Event $event = null) {

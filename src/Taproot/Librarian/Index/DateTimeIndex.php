@@ -6,6 +6,7 @@ use DateTime;
 use Doctrine\DBAL;
 use Taproot\Librarian\Librarian;
 use Taproot\Librarian\Event;
+use Taproot\Librarian\CrudEvent;
 use Taproot\Librarian\LibrarianInterface as Events;
 
 // TODO: move a load of the basics to an Abstract class
@@ -18,7 +19,10 @@ class DateTimeIndex implements IndexInterface {
 	
 	public static function getSubscribedEvents() {
 		return [
-			
+			// Turn the datetime property into a DateTime object after unserialisation
+			Events::GET_EVENT => ['hydrateProperty', -100],
+			// Turn the datetime property into a string if it’s a DateTime
+			Events::PUT_EVENT => ['dehydrateProperty', 100]
 		];
 	}
 	
@@ -46,6 +50,31 @@ class DateTimeIndex implements IndexInterface {
 		return $this->librarian->namespace . '_datetime_index_' . $this->name . '_on_' . $this->propertyName;
 	}
 	
+	public function hydrateProperty(CrudEvent $event) {
+		$data = $event->getData();
+		
+		if (empty($data[$this->propertyName]))
+			return;
+		
+		try {
+			$data[$this->propertyName] = new DateTime($data[$this->propertyName]);
+			$event->setData($data);
+		} catch (Exception $e) {
+			return;
+		}
+	}
+	
+	public function dehydrateProperty(CrudEvent $event) {
+		$data = $event->getData();
+		
+		if (empty($data[$this->propertyName]) or !$data[$this->propertyName] instanceof DateTime)
+			return;
+		
+		// TODO: make this configurable?
+		$data[$this->propertyName] = $data[$this->propertyName]->format(DateTime::W3C);
+		$event->setData($data);
+	}
+	
 	// TODO: move id and last_indexed to the caller to generalise?
 	public function makeTableRepresentation(DBAL\Schema\Table $table) {
 		$table->addColumn('id', 'string', ['length' => 30]);
@@ -53,6 +82,30 @@ class DateTimeIndex implements IndexInterface {
 		$table->addColumn('last_indexed', 'integer', ['length' => 50]);
 		
 		$table->addIndex(['id', 'datetime']);
+	}
+	
+	public function update($id, $lastModified) {
+		// Delete any rows for this item which were indexed before $lastModified
+		assert(!empty($lastModified));
+		assert(is_int($lastModified));
+		
+		$this->db->executeQuery('delete from ' 
+			. $this->db->quoteIdentifier($this->getTableName()) 
+			. ' where id = ? and last_indexed < ?',
+			[$id, $lastModified]);
+		
+		$data = $this->librarian->get($id);
+		
+		if (empty($data[$this->propertyName]) or !$data[$this->propertyName] instanceof DateTime)
+			return;
+		
+		$now = time();
+		
+		$this->db->insert($this->getTableName(), [
+			'id' => $id,
+			'datetime' => $data[$this->propertyName]->format('Y-m-d H:i:s'),
+			'last_indexed' => $now
+		]);
 	}
 }
 

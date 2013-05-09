@@ -100,6 +100,18 @@ class Librarian implements LibrarianInterface {
 	}
 	
 	public function buildIndexes() {
+		foreach ($this->crud->getAllDocumentPaths() as $id => $path) {
+			$lastModified = filemtime($path);
+			
+			assert(is_int($lastModified));
+			assert(!empty($lastModified));
+			
+			foreach ($this->indexes as $index) {
+				$index->update($id, $lastModified);
+			}
+		}
+		
+		// TODO: will this ever do anything?
 		$event = new Event($this);
 		$this->dispatcher->dispatch(self::BUILD_INDEXES, $event);
 	}
