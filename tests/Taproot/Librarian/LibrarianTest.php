@@ -149,7 +149,15 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		
 		$db = $this->l->getConn();
 		
-		$rows = $db->executeQuery('select count(*) from test_datetime_index_published_on_published')->fetch();
+		$rows = $db->executeQuery('select count(*), last_indexed from test_datetime_index_published_on_published')->fetch();
 		$this->assertEquals(1, $rows['count(*)']);
+		$lastIndexed = $rows['last_indexed'];
+		
+		// Assert doesn’t change the row if the document hasn’t changed
+		$this->l->buildIndexes();
+		
+		$rows = $db->executeQuery('select last_indexed from test_datetime_index_published_on_published')->fetch();
+		
+		$this->assertEquals($lastIndexed, $rows['last_indexed']);
 	}
 }

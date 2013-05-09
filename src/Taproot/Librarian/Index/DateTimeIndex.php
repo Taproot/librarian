@@ -94,6 +94,15 @@ class DateTimeIndex implements IndexInterface {
 			. ' where id = ? and last_indexed < ?',
 			[$id, $lastModified]);
 		
+		// If there are still up-to-date rows, the index is up to date
+		$res = $this->db->executeQuery('select count(*) from '
+			. $this->db->quoteIdentifier($this->getTableName())
+			. ' where id = ?', [$id])->fetch();
+		
+		if ($res['count(*)'] > 0)
+			return;
+		
+		// The index is out of date, so load the document and update it
 		$data = $this->librarian->get($id);
 		
 		if (empty($data[$this->propertyName]) or !$data[$this->propertyName] instanceof DateTime)
