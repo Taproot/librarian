@@ -4,6 +4,7 @@ namespace Taproot\Librarian\Test;
 
 use Taproot\Librarian as L;
 use Taproot\Librarian\Index;
+use DateTime;
 
 class LibrarianTest extends \PHPUnit_Framework_TestCase {
 	private $l;
@@ -15,7 +16,7 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		
 		$this->l = new L\Librarian('test', [
 			'db' => [
-				'name' => $this->path . '/indexes.sq3',
+				'name' => rtrim($this->path, '/') . '/indexes.sq3',
 				'driver' => 'pdo_sqlite'
 			]
 		],
@@ -115,10 +116,32 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		
 		$this->assertFalse($s->hasTable('test_datetime_index_published_on_published'));
 		
-		$this->l->buildEnvironment();
+		$queriesExecuted = $this->l->buildEnvironment();
 		
 		// Update schema representation
 		$s = $db->getSchemaManager()->createSchema();
 		$this->assertTrue($s->hasTable('test_datetime_index_published_on_published'));
+		$this->assertGreaterThanOrEqual(1, $queriesExecuted);
+		
+		// Assert applying no diffs executes no queries
+		$queriesExecuted = $this->l->buildEnvironment();
+		$this->assertEquals(0, $queriesExecuted);
+	}
+	
+	public function testBuildIndexesAddsRowForExistingDocument() {
+		date_default_timezone_set('UTC');
+		
+		$this->l->put([
+			'id' => 1,
+			'published' => new DateTime('2013-05-09 09:42:29')
+		]);
+		
+		$this->l->buildEnvironment();
+		$this->l->buildIndexes();
+		
+		$db = $this->l->getConn();
+		
+		$rows = $db->executeQuery('select count(*) from test_datetime_index_published_on_published')->fetch();
+		$this->assertEquals(1, $rows['count(*)']);
 	}
 }

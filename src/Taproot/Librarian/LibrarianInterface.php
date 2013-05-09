@@ -7,6 +7,7 @@ interface LibrarianInterface {
 	const PUT_EVENT = 'crud.put';
 	const DELETE_EVENT = 'crud.delete';
 	const BUILD_ENVIRONMENT_EVENT = 'environment.build';
+	const BUILD_INDEXES = 'indexes.build';
 	
 	/**
 	 * Constructor

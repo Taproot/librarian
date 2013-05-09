@@ -86,11 +86,13 @@ class Librarian implements LibrarianInterface {
 		
 		$event = new Event($this);
 		$this->dispatcher->dispatch(self::BUILD_ENVIRONMENT_EVENT, $event);
+		
+		return count($sql);
 	}
 	
 	public function buildIndexes() {
 		$event = new Event($this);
-		$this->dispatcher->dispatch(Event::BUILD_INDEXES, $event);
+		$this->dispatcher->dispatch(self::BUILD_INDEXES, $event);
 	}
 	
 	public function get($id) {
