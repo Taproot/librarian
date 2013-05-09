@@ -154,6 +154,8 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals(1, $rows['count(*)']);
 		$lastIndexed = $rows['last_indexed'];
 		
+		sleep(1);
+		
 		// Assert doesn’t change the row if the document hasn’t changed
 		$this->l->buildIndexes();
 		
@@ -163,11 +165,11 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		// Assert does change the row once the document *has* changed
 		$this->l->put([
 			'id' => 1,
-			'published' => new DateTime('2013-05-09 09:42:29'),
+			'published' => new DateTime('2013-05-09 09:42:30'),
 			'newField' => 'nothing to see here'
 		]);
 		
-		$rows = $db->executeQuery('select last_indexed from test_datetime_index_published_on_published')->fetch();
+		$rows = $db->executeQuery('select last_indexed from test_datetime_index_published_on_published where id = "1"')->fetch();
 		$this->assertNotEquals($lastIndexed, $rows['last_indexed']);
 	}
 }

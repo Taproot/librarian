@@ -22,7 +22,7 @@ class DateTimeIndex implements IndexInterface {
 			// Turn the datetime property into a DateTime object after unserialisation
 			Events::GET_EVENT => ['hydrateProperty', -100],
 			// Turn the datetime property into a string if it’s a DateTime
-			Events::PUT_EVENT => ['dehydrateProperty', 100]
+			Events::PUT_EVENT => ['dehydratePropertyAndUpdateIndex', 100]
 		];
 	}
 	
@@ -64,15 +64,25 @@ class DateTimeIndex implements IndexInterface {
 		}
 	}
 	
-	public function dehydrateProperty(CrudEvent $event) {
+	// TODO: split functionality into two functions
+	public function dehydratePropertyAndUpdateIndex(CrudEvent $event) {
 		$data = $event->getData();
 		
 		if (empty($data[$this->propertyName]) or !$data[$this->propertyName] instanceof DateTime)
 			return;
 		
 		// TODO: make this configurable?
-		$data[$this->propertyName] = $data[$this->propertyName]->format(DateTime::W3C);
+		$datetime = $data[$this->propertyName];
+		$data[$this->propertyName] = $datetime->format(DateTime::W3C);
 		$event->setData($data);
+		
+		// Refresh index
+		$this->db->delete($this->getTableName(), ['id' => $event->getId()]);
+		$this->db->insert($this->getTableName(), [
+			'id' => $event->getId(),
+			'datetime' => $datetime->format('Y-m-d H:i:s'),
+			'last_indexed' => time()
+		]);
 	}
 	
 	// TODO: move id and last_indexed to the caller to generalise?

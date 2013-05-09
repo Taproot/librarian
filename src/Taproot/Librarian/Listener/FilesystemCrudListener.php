@@ -71,6 +71,8 @@ class FilesystemCrudListener implements EventDispatcher\EventSubscriberInterface
 			$event->setData(true);
 		else
 			throw new CrudException('Couldn’t write file "' . $this->pathForId($id) . '"');
+		
+		clearstatcache();
 	}
 	
 	public function getFromFilesystem(CrudEvent $event) {
@@ -87,6 +89,7 @@ class FilesystemCrudListener implements EventDispatcher\EventSubscriberInterface
 	public function deleteFromFilesystem(CrudEvent $event) {
 		$id = $event->getData();
 		unlink($this->pathForId($id));
+		clearstatcache();
 	}
 	
 	protected function pathForId($id) {
