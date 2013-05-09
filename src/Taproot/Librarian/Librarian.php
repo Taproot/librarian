@@ -2,8 +2,9 @@
 
 namespace Taproot\Librarian;
 
-use Symfony\Component\EventDispatcher;
+use Doctrine\DBAL;
 use Psr\Log;
+use Symfony\Component\EventDispatcher;
 
 class Librarian implements LibrarianInterface {
 	/** @var string **/
@@ -18,6 +19,9 @@ class Librarian implements LibrarianInterface {
 	/** @var array IndexInterface **/
 	private $indexes = [];
 	
+	/** @var DBAL\Connection **/
+	private $db;
+	
 	public function __construct($namespace, array $config = [], array $indexes = []) {
 		$this->namespace = $namespace;
 		
@@ -25,15 +29,48 @@ class Librarian implements LibrarianInterface {
 		
 		$this->dispatcher = new EventDispatcher\EventDispatcher();
 		$this->logger = new Log\NullLogger();
+		
+		foreach ($this->indexes as $index) {
+			$index->setLibrarian($this);
+			$this->dispatcher->addSubscriber($index);
+		}
+		
+		// TODO: put this elsewhere? Currently this ties Librarian to Doctrine\DBAL
+		if (isset($config['db'])) {
+			$c = $config['db'];
+			$config = new DBAL\Configuration();
+			$connectionParams = [
+				'dbname' => @($c['dbname'] ?: $c['name'] ?: $c['database'] ?: $c['db']),
+				'user' => @($c['user'] ?: $c['username'] ?: null),
+				'password' => @($c['password'] ?: null),
+				'host' => @($c['host'] ?: null),
+				'driver' => $c['driver']
+			];
+			
+			$this->db = DBAL\DriverManager::getConnection($connectionParams, $config);
+			
+			foreach ($this->indexes as $index) {
+				$index->setConnection($this->db);
+			}
+		}
+	}
+	
+	public function getConn() {
+		return $this->db;
 	}
 	
 	public function buildEnvironment() {
+		foreach ($this->indexes as $index) {
+			
+		}
+		
 		$event = new Event($this);
 		$this->dispatcher->dispatch(self::BUILD_ENVIRONMENT_EVENT, $event);
 	}
 	
 	public function buildIndexes() {
-		
+		$event = new Event($this);
+		$this->dispatcher->dispatch(Event::BUILD_INDEXES, $event);
 	}
 	
 	public function get($id) {

@@ -3,6 +3,7 @@
 namespace Taproot\Librarian\Test;
 
 use Taproot\Librarian as L;
+use Taproot\Librarian\Index;
 
 class LibrarianTest extends \PHPUnit_Framework_TestCase {
 	private $l;
@@ -10,9 +11,15 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 	
 	public function setUp() {
 		parent::setUp();
-		$this->path = realpath(__DIR__ . '/../../tmp_test_data/');
+		$this->path = __DIR__ . '/../../tmp_test_data/';
 		
-		$this->l = new L\Librarian('test', []);
+		$this->l = new L\Librarian('test', [
+			'db' => [
+				'name' => $this->path . '/indexes.sq3',
+				'driver' => 'pdo_sqlite'
+			]
+		],
+		['published' => new Index\DateTimeIndex('published')]);
 		
 		// TODO: put this setup code somewhere more abstract perhaps
 		$l = new L\Listener\FilesystemCrudListener([
@@ -103,6 +110,15 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 	}
 	
 	public function testBuildEnvironmentCreatesIndexTables() {
+		$db = $this->l->getConn();
+		$s = $db->getSchemaManager()->createSchema();
 		
+		$this->assertFalse($s->hasTable('test_datetime_index_published_on_published'));
+		
+		$this->l->buildEnvironment();
+		
+		// Update schema representation
+		$s = $db->getSchemaManager()->createSchema();
+		$this->assertTrue($s->hasTable('test_datetime_index_published_on_published'));
 	}
 }
