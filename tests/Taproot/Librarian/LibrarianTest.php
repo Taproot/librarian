@@ -136,6 +136,7 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals(0, $queriesExecuted);
 	}
 	
+	// TODO: split this up into multiple tests
 	public function testBuildIndexesAddsRowForExistingDocument() {
 		date_default_timezone_set('UTC');
 		
@@ -157,7 +158,16 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		$this->l->buildIndexes();
 		
 		$rows = $db->executeQuery('select last_indexed from test_datetime_index_published_on_published')->fetch();
-		
 		$this->assertEquals($lastIndexed, $rows['last_indexed']);
+		
+		// Assert does change the row once the document *has* changed
+		$this->l->put([
+			'id' => 1,
+			'published' => new DateTime('2013-05-09 09:42:29'),
+			'newField' => 'nothing to see here'
+		]);
+		
+		$rows = $db->executeQuery('select last_indexed from test_datetime_index_published_on_published')->fetch();
+		$this->assertNotEquals($lastIndexed, $rows['last_indexed']);
 	}
 }
