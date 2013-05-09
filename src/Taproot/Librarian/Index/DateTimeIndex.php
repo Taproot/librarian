@@ -161,7 +161,7 @@ class DateTimeQueryIndex extends AbstractQueryIndex implements OrderableIndexInt
 	}
 	
 	public function before($datetime) {
-	
+		
 	}
 	
 	public function after($datetime) {
