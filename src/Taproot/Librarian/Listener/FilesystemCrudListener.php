@@ -39,6 +39,22 @@ class FilesystemCrudListener implements EventDispatcher\EventSubscriberInterface
 		return $this->path;
 	}
 	
+	public function getAllDocumentPaths() {
+		$dir = opendir($this->path);
+		$paths = [];
+		
+		while (($entry = readdir($dir)) !== false) {
+			$path = $this->path . $entry;
+			if ($entry == '.' or $entry == '..' or is_dir($path))
+				continue;
+			
+			$paths[] = $entry;
+		}
+		
+		closedir($dir);
+		return $paths;
+	}
+	
 	public function setEventItemId(CrudEvent $event) {
 		$data = $event->getData();
 		$event->setId($data[$this->idField]);

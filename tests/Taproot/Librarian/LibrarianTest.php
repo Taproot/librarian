@@ -16,22 +16,23 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		
 		$this->l = new L\Librarian('test', [
 			'db' => [
-				'name' => rtrim($this->path, '/') . '/indexes.sq3',
+				'path' => realpath(rtrim($this->path, '/') . '/indexes.sq3'),
 				'driver' => 'pdo_sqlite'
 			]
 		],
 		['published' => new Index\DateTimeIndex('published')]);
 		
 		// TODO: put this setup code somewhere more abstract perhaps
-		$l = new L\Listener\FilesystemCrudListener([
+		$crud = new L\Listener\FilesystemCrudListener([
 			'path' => $this->path,
 			'extension' => '.json',
 			'idField' => 'id'
 		]);
 		
+		$this->l->setCrudHandler($crud);
+		
 		$jL = new L\Listener\JsonListener();
 		
-		$this->l->dispatcher->addSubscriber($l);
 		$this->l->dispatcher->addSubscriber($jL);
 	}
 	

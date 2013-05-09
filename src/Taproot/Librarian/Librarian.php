@@ -22,6 +22,8 @@ class Librarian implements LibrarianInterface {
 	/** @var DBAL\Connection **/
 	private $db;
 	
+	private $crud;
+	
 	public function __construct($namespace, array $config = [], array $indexes = []) {
 		$this->namespace = $namespace;
 		
@@ -41,10 +43,11 @@ class Librarian implements LibrarianInterface {
 			$c = $config['db'];
 			$config = new DBAL\Configuration();
 			$connectionParams = [
-				'dbname' => @($c['dbname'] ?: $c['name'] ?: $c['database'] ?: $c['db']),
+				'dbname' => @($c['dbname'] ?: $c['name'] ?: $c['database'] ?: $c['db'] ?: null),
 				'user' => @($c['user'] ?: $c['username'] ?: null),
 				'password' => @($c['password'] ?: null),
 				'host' => @($c['host'] ?: null),
+				'path' => @($c['path'] ?: null),
 				'driver' => $c['driver']
 			];
 			
@@ -56,11 +59,20 @@ class Librarian implements LibrarianInterface {
 		}
 	}
 	
+	public function setCrudHandler($crudHandler) {
+		$this->crud = $crudHandler;
+		$this->dispatcher->addSubscriber($this->crud);
+	}
+	
 	public function getConn() {
 		return $this->db;
 	}
 	
 	public function buildEnvironment() {
+		$event = new Event($this);
+		$this->dispatcher->dispatch(self::BUILD_ENVIRONMENT_EVENT, $event);
+		
+		// Calculate difference between current schema and the schema we need
 		$fromSchema = $this->db->getSchemaManager()->createSchema();
 		$toSchema = clone $fromSchema;
 		
@@ -83,9 +95,6 @@ class Librarian implements LibrarianInterface {
 		foreach ($sql as $query) {
 			$this->db->executeQuery($query);
 		}
-		
-		$event = new Event($this);
-		$this->dispatcher->dispatch(self::BUILD_ENVIRONMENT_EVENT, $event);
 		
 		return count($sql);
 	}
@@ -114,6 +123,7 @@ class Librarian implements LibrarianInterface {
 		return $event->getData();
 	}
 	
+	// TODO: write
 	public function query($limit = 20, $orderBy = []) {
 		
 	}
