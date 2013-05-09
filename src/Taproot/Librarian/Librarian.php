@@ -30,7 +30,8 @@ class Librarian implements LibrarianInterface {
 		$this->dispatcher = new EventDispatcher\EventDispatcher();
 		$this->logger = new Log\NullLogger();
 		
-		foreach ($this->indexes as $index) {
+		foreach ($this->indexes as $name => $index) {
+			$index->setName($name);
 			$index->setLibrarian($this);
 			$this->dispatcher->addSubscriber($index);
 		}
@@ -60,8 +61,27 @@ class Librarian implements LibrarianInterface {
 	}
 	
 	public function buildEnvironment() {
+		$fromSchema = $this->db->getSchemaManager()->createSchema();
+		$toSchema = clone $fromSchema;
+		
 		foreach ($this->indexes as $index) {
+			$indexName = $index->getTableName();
 			
+			if ($toSchema->hasTable($indexName))
+				$toSchema->dropTable($indexName);
+			
+			$table = $toSchema->createTable($indexName);
+			
+			$index->makeTableRepresentation($table);
+		}
+		
+		// Execute schema diff
+		$sql = $fromSchema->getMigrateToSql($toSchema, $this->db->getDatabasePlatform());
+		
+		assert(is_array($sql));
+		
+		foreach ($sql as $query) {
+			$this->db->executeQuery($query);
 		}
 		
 		$event = new Event($this);
