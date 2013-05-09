@@ -176,9 +176,8 @@ class DateTimeQueryIndex extends AbstractQueryIndex implements OrderableIndexInt
 			$datetime = new DateTime($datetime);
 			
 		$this->queryBuilder->andWhere($this->db->quoteIdentifier($this->index->getName())
-			. ' datetime > '
-			. $this->db->quote($datetime->format('Y-m-d H:i:s'))
-			. ' order by datetime asc')
+			. '.datetime > '
+			. $this->db->quote($datetime->format('Y-m-d H:i:s')))
 			->orderBy('abs(datediff( '
 				. $this->db->quoteIdentifier($this->index->getName())
 				. '.datetime, '
