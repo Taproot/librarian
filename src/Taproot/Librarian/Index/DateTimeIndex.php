@@ -9,8 +9,6 @@ use Taproot\Librarian\Event;
 use Taproot\Librarian\CrudEvent;
 use Taproot\Librarian\LibrarianInterface as Events;
 
-// TODO: move a load of the basics to an Abstract class
-// TODO: move a load of these method sigs to IndexInterface
 class DateTimeIndex extends AbstractIndex {
 	private $librarian;
 	private $name;
@@ -28,22 +26,6 @@ class DateTimeIndex extends AbstractIndex {
 	
 	public function __construct($propertyName) {
 		$this->propertyName = $propertyName;
-	}
-	
-	public function setConnection(DBAL\Connection $conn) {
-		$this->db = $conn;
-	}
-	
-	public function setLibrarian(Librarian $l) {
-		$this->librarian = $l;
-	}
-	
-	public function setName($name) {
-		$this->name = $name;
-	}
-	
-	public function getName() {
-		return $this->name;
 	}
 	
 	public function getQueryIndex() {
@@ -89,7 +71,6 @@ class DateTimeIndex extends AbstractIndex {
 		]);
 	}
 	
-	// TODO: move id and last_indexed to the caller to generalise?
 	public function makeTableRepresentation(DBAL\Schema\Table $table) {
 		$table->addColumn('id', 'string', ['length' => 30]);
 		$table->addColumn('datetime', 'datetime');
@@ -133,23 +114,6 @@ class DateTimeIndex extends AbstractIndex {
 }
 
 class DateTimeQueryIndex extends AbstractQueryIndex implements OrderableIndexInterface {
-	protected $index;
-	protected $queryBuilder;
-	protected $db;
-	
-	public function __construct($index, $db) {
-		$this->index = $index;
-		$this->db = $db;
-	}
-	
-	public function getTableName() {
-		return $this->index->getTableName();
-	}
-	
-	public function setQueryBuilder($b) {
-		$this->queryBuilder = $b;
-	}
-	
 	public function orderBy($direction) {
 		if (in_array(strtolower($direction), ['desc', 'newestfirst', 'reverse']))
 			$direction = 'desc';

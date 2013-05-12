@@ -5,7 +5,23 @@ namespace Taproot\Librarian\Index;
 use Taproot\Librarian\Query;
 
 abstract class AbstractQueryIndex {
-	private $query;
+	protected $query;
+	protected $index;
+	protected $queryBuilder;
+	protected $db;
+	
+	public function __construct($index, $db) {
+		$this->index = $index;
+		$this->db = $db;
+	}
+	
+	public function getTableName() {
+		return $this->index->getTableName();
+	}
+	
+	public function setQueryBuilder($b) {
+		$this->queryBuilder = $b;
+	}
 	
 	final public function setQuery(Query $query) {
 		$this->query = $query;
