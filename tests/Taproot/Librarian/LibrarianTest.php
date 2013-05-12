@@ -265,5 +265,12 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 			->fetch();
 		
 		$this->assertEquals([2, 1], $docs->getIds());
+		
+		$docs = $this->l->query(2, $orderBy = ['published' => 'newestFirst'])
+			->tagged-with('web')
+			->after('2013-05-01 15:00:00')
+			->fetch();
+		
+		$this->assertEquals([2], $docs->getIds());
 	}
 }
