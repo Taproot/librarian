@@ -235,6 +235,6 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 			->published->after('2013-05-02 12:00:00')
 			->fetch();
 		
-		$this->assertEquals([2, 3], $docs->getIds());
+		$this->assertEquals([3, 2], $docs->getIds());
 	}
 }
