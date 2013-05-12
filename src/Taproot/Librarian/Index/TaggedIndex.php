@@ -11,7 +11,7 @@ class TaggedIndex extends AbstractIndex {
 	
 	public static function getSubscribedEvents() {
 		return [
-			Events::PUT_EVENT => ['updateIndex', 100]
+			Events::PUT_EVENT => ['onPutEvent', 100]
 		];
 	}
 	
@@ -35,10 +35,14 @@ class TaggedIndex extends AbstractIndex {
 		$table->addIndex(['id', 'tag']);
 	}
 	
-	public function updateIndex(CrudEvent $event) {
+	public function onPutEvent(CrudEvent $event) {
 		$data = $event->getData();
 		$id = $event->getId();
 		
+		return $this->updateIndex($data, $id);
+	}
+	
+	public function updateIndex($data, $id) {
 		// Remove records currently associated with this id
 		$this->db->delete($this->getTableName(), ['id' => $id]);
 		
@@ -54,8 +58,28 @@ class TaggedIndex extends AbstractIndex {
 		}
 	}
 	
+	// TODO: figure out how to generalise most of this logic
 	public function update($id, $lastModified) {
+		$this->db->executeQuery('delete from ' 
+			. $this->db->quoteIdentifier($this->getTableName()) 
+			. ' where id = ? and last_indexed < ?',
+			[$id, $lastModified]);
 		
+		// If there are still up-to-date rows, the index is up to date
+		$res = $this->db->executeQuery('select count(*) from '
+			. $this->db->quoteIdentifier($this->getTableName())
+			. ' where id = ?', [$id])->fetch();
+		
+		if ($res['count(*)'] > 0)
+			return;
+		
+		// The index is out of date, so load the document and update it
+		$data = $this->librarian->get($id);
+		
+		if (empty($data[$this->propertyName]) or !$data[$this->propertyName] instanceof DateTime)
+			return;
+		
+		$this->updateIndex($data, $id);
 	}
 }
 
