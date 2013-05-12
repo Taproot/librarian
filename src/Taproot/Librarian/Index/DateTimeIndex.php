@@ -10,10 +10,7 @@ use Taproot\Librarian\CrudEvent;
 use Taproot\Librarian\LibrarianInterface as Events;
 
 class DateTimeIndex extends AbstractIndex {
-	private $librarian;
-	private $name;
 	private $propertyName;
-	private $db;
 	
 	public static function getSubscribedEvents() {
 		return [

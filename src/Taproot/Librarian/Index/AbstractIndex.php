@@ -2,6 +2,8 @@
 
 namespace Taproot\Librarian\Index;
 
+use Taproot\Librarian\Librarian;
+use Doctrine\DBAL;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 abstract class AbstractIndex implements EventSubscriberInterface {
@@ -9,13 +11,17 @@ abstract class AbstractIndex implements EventSubscriberInterface {
 	protected $librarian;
 	protected $name;
 	
-	abstract public static function getSubscribedEvents();
+	public static function getSubscribedEvents() {
+		return [];
+	}
 	
 	abstract public function getQueryIndex();
 	
 	abstract public function getTableName();
 	
-	abstract public function makeTableRepresentation();
+	abstract public function makeTableRepresentation(DBAL\Schema\Table $table);
+	
+	abstract public function update($id, $lastModified);
 	
 	public function setConnection(DBAL\Connection $conn) {
 		$this->db = $conn;
