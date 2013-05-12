@@ -11,7 +11,7 @@ use Taproot\Librarian\LibrarianInterface as Events;
 
 // TODO: move a load of the basics to an Abstract class
 // TODO: move a load of these method sigs to IndexInterface
-class DateTimeIndex implements IndexInterface {
+class DateTimeIndex extends AbstractIndex {
 	private $librarian;
 	private $name;
 	private $propertyName;

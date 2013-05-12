@@ -27,7 +27,10 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 				'driver' => 'pdo_mysql'
 			]
 		],
-		['published' => new Index\DateTimeIndex('published')]);
+		[
+			'published' => new Index\DateTimeIndex('published'),
+			'tagged' => new Index\TaggedIndex('tags')
+		]);
 		
 		// TODO: put this setup code somewhere more abstract perhaps
 		$crud = new L\Listener\FilesystemCrudListener([
@@ -236,5 +239,31 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 			->fetch();
 		
 		$this->assertEquals([3, 2], $docs->getIds());
+	}
+	
+	public function testTaggedIndexJoinsCorrectly() {
+		$this->l->put([
+			'id' => 1,
+			'published' => '2013-05-01 12:00:00',
+			'tags' => ['personal', 'web']
+		]);
+		
+		$this->l->put([
+			'id' => 2,
+			'published' => '2013-05-02 12:00:00',
+			'tags' => ['food', 'web']
+		]);
+		
+		$this->l->put([
+			'id' => 3,
+			'published' => '2013-05-03 12:00:00',
+			'tags' => ['thing', 'another']
+		]);
+		
+		$docs = $this->l->query(2, $orderBy = ['published' => 'newestFirst'])
+			->tagged->with('web')
+			->fetch();
+		
+		$this->assertEquals([2, 1], $docs->getIds());
 	}
 }
