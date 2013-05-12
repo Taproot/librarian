@@ -174,17 +174,16 @@ class DateTimeQueryIndex extends AbstractQueryIndex implements OrderableIndexInt
 	public function after($datetime) {
 		if (!$datetime instanceof DateTime)
 			$datetime = new DateTime($datetime);
-			
-		$this->queryBuilder->andWhere($this->db->quoteIdentifier($this->index->getName())
-			. '.datetime > '
-			. $this->db->quote($datetime->format('Y-m-d H:i:s')))
-			->orderBy('abs(datediff( '
-				. $this->db->quoteIdentifier($this->index->getName())
-				. '.datetime, '
-				. $this->db->quote($datetime->format('Y-m-d H:i:s'))
-				. '))',
-				'asc',
-				true);
+		
+		$tbl = $this->db->quoteIdentifier($this->index->getTableName());
+		$name = $this->db->quoteIdentifier($this->index->getName());
+		
+		$this->queryBuilder->from('(select * from '
+			. $tbl . ' as inner_datetime_table where inner_datetime_table.datetime > '
+			. $this->db->quote($datetime->format('Y-m-d H:i:s'))
+			. ' limit '
+			. $this->queryBuilder->getMaxResults()
+			. ')', $this->index->getName());
 		
 		return $this;
 	}

@@ -47,6 +47,7 @@ class Query {
 	}
 	
 	public function fetch() {
+		//echo $this->queryBuilder->getSql();
 		return new DocumentCollection(array_map(function ($item) {
 			return $item['id'];
 		}, $this->queryBuilder->execute()->fetchAll())
