@@ -2,3 +2,4 @@ composer.phar
 /vendor/
 .DS_Store
 /tests/tmp_test_data/
+/docs
