@@ -11,6 +11,13 @@ use Symfony\Component\EventDispatcher;
  * 
  * The interface through which most of Librarian is exposed.
  * 
+ * ## Example Usage:
+ * 
+ *     use Taproot\Librarian;
+ *     $l = new Librarian\Librarian('documents', ['db' => •••], ['published' => Librarian\Index\DateTimeIndex('published')]);
+ *     $l->buildEnvironment();
+ *     $l->put(['id' => 1, 'published' => new DateTime(), 'content' => 'A Document!']);
+ * 
  * @author Barnaby Walters
  */
 class Librarian implements LibrarianInterface {
