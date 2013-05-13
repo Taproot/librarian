@@ -139,6 +139,7 @@ class DateTimeQueryIndex extends AbstractQueryIndex implements OrderableIndexInt
 		$tbl = $this->db->quoteIdentifier($this->index->getTableName());
 		$name = $this->db->quoteIdentifier($this->index->getName());
 		
+		$this->queryBuilder->resetQueryPart('from');
 		$this->queryBuilder->from('(select * from '
 			. $tbl . ' as inner_datetime_table where inner_datetime_table.datetime > '
 			. $this->db->quote($datetime->format('Y-m-d H:i:s'))

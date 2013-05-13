@@ -19,6 +19,10 @@ abstract class AbstractQueryIndex {
 		return $this->index->getTableName();
 	}
 	
+	public function getName() {
+		return $this->index->getName();
+	}
+	
 	public function setQueryBuilder($b) {
 		$this->queryBuilder = $b;
 	}

@@ -4,6 +4,7 @@ namespace Taproot\Librarian\Test;
 
 use Taproot\Librarian as L;
 use Taproot\Librarian\Index;
+use Doctrine\DBAL;
 use DateTime;
 
 class LibrarianTest extends \PHPUnit_Framework_TestCase {
@@ -267,10 +268,37 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals([2, 1], $docs->getIds());
 		
 		$docs = $this->l->query(2, $orderBy = ['published' => 'newestFirst'])
-			->tagged-with('web')
-			->after('2013-05-01 15:00:00')
+			->published->after('2013-05-01 15:00:00')
+			->tagged->with('web')
 			->fetch();
 		
 		$this->assertEquals([2], $docs->getIds());
+	}
+	
+	public function testDoctrineQueryBuilderHandlesJoinsCorrectly() {
+		$db = DBAL\DriverManager::getConnection([
+			'name' => 'waterpigs_co_uk_test',
+			'username' => 'test',
+			'password' => 'test',
+			'host' => '127.0.0.1',
+			'driver' => 'pdo_mysql'
+		], new DBAL\Configuration);
+		
+		$qb = $db->createQueryBuilder();
+		
+		$qb->where('t.thing = "value"');
+		
+		$qb->from('tablename', 't');
+		
+		$qb->select('*');
+		$qb->leftJoin('t', 'othertable', 'o', 'o.id = t.id');
+		
+		// Turns out resetQueryPart must be called before calling from() again or
+		// joins will be completely discarded
+		$qb->resetQueryPart('from');
+		$qb->from('(select * from inner_table)', 't');
+		
+		$this->assertEquals('SELECT * FROM (select * from inner_table) t LEFT JOIN othertable o ON o.id = t.id WHERE t.thing = "value"',
+			$qb->getSql());
 	}
 }

@@ -11,6 +11,7 @@ class Query {
 	private $limit;
 	private $queryBuilder;
 	private $librarian;
+	private $mainIndex;
 	
 	public function __construct($librarian, $db, $limit, $orderBy, $indexes) {
 		$this->librarian = $librarian;
@@ -20,26 +21,17 @@ class Query {
 		
 		$this->queryBuilder = $this->db->createQueryBuilder();
 		$this->queryBuilder->setMaxResults($limit);
-		$first = true;
 		
-		foreach ($this->indexes as $name => $index) {
+		foreach ($this->indexes as $index) {
 			$index->setQuery($this);
 			$index->setQueryBuilder($this->queryBuilder);
-			
-			// TODO: determine which tables to join lazily if there’s a performance benefit;
-			if ($first) {
-				$this->queryBuilder->select('distinct ' . $this->db->quoteIdentifier($name) . '.id')
-					->from($index->getTableName(), $name);
-				$first = false;
-				$mainIndexId = $name;
-			} else {
-				$this->queryBuilder->leftJoin($mainIndexId, $index->getTableName(), $name,
-					$this->db->quoteIdentifier($mainIndexId)
-					. '.id = '
-					. $this->db->quoteIdentifier($name)
-					. '.id');
-			}
 		}
+		
+		// TODO: make this explicitly defined?
+		$this->mainIndex = current($this->indexes);
+		
+		$this->queryBuilder->select('distinct ' . $this->db->quoteIdentifier($this->mainIndex->getName()) . '.id')
+			->from($this->mainIndex->getTableName(), $this->mainIndex->getName());
 		
 		foreach ($orderBy as $name => $direction) {
 			$this->indexes[$name]->orderBy($direction);
@@ -47,7 +39,14 @@ class Query {
 	}
 	
 	public function fetch() {
-		//echo $this->queryBuilder->getSql() . "\n";
+		foreach (array_slice($this->indexes, 1) as $name => $index) {
+			$this->queryBuilder->leftJoin($this->mainIndex->getName(), $index->getTableName(), $name,
+				$this->db->quoteIdentifier($this->mainIndex->getName())
+				. '.id = '
+				. $this->db->quoteIdentifier($name)
+				. '.id');
+		}
+		
 		return new DocumentCollection(array_map(function ($item) {
 			return $item['id'];
 		}, $this->queryBuilder->execute()->fetchAll())
