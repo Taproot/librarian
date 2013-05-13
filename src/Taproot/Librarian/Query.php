@@ -7,13 +7,32 @@ use Exception;
 
 class Query {
 	private $indexes = [];
+	
+	/** @var DBAL\Connection */
 	private $db;
-	private $limit;
+	
+	/** @var DBAL\Query\QueryBuilder */
 	private $queryBuilder;
+	
+	/** @var LibrarianInterface */
 	private $librarian;
+	
+	/** @var Index\AbstractIndex */
 	private $mainIndex;
 	
-	public function __construct($librarian, $db, $limit, $orderBy, $indexes) {
+	/** @var int */
+	private $limit;
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param Librarian $librarian The librarian interface responsible for the query
+	 * @param DBAL\Connection $db A Doctrine Connection
+	 * @param int $limit The maximum number of results to return
+	 * @param array $orderBy An assoc. array of indexName => direction
+	 * @param array $indexes An assoc. array of indexName => Index
+	 */
+	public function __construct(LibrarianInterface $librarian, DBAL\Connection $db, $limit, array $orderBy, array $indexes) {
 		$this->librarian = $librarian;
 		$this->indexes = $indexes;
 		$this->db = $db;
@@ -30,15 +49,6 @@ class Query {
 		// TODO: make this explicitly defined?
 		$this->mainIndex = current($this->indexes);
 		
-		$this->queryBuilder->select('distinct ' . $this->db->quoteIdentifier($this->mainIndex->getName()) . '.id')
-			->from($this->mainIndex->getTableName(), $this->mainIndex->getName());
-		
-		foreach ($orderBy as $name => $direction) {
-			$this->indexes[$name]->orderBy($direction);
-		}
-	}
-	
-	public function fetch() {
 		foreach (array_slice($this->indexes, 1) as $name => $index) {
 			$this->queryBuilder->leftJoin($this->mainIndex->getName(), $index->getTableName(), $name,
 				$this->db->quoteIdentifier($this->mainIndex->getName())
@@ -47,6 +57,20 @@ class Query {
 				. '.id');
 		}
 		
+		$this->queryBuilder->select('distinct ' . $this->db->quoteIdentifier($this->mainIndex->getName()) . '.id')
+			->from($this->mainIndex->getTableName(), $this->mainIndex->getName());
+		
+		foreach ($orderBy as $name => $direction) {
+			$this->indexes[$name]->orderBy($direction);
+		}
+	}
+	
+	/**
+	 * Fetch
+	 * 
+	 * @return DocumentCollection A collection of the documents returned by the query
+	 */
+	public function fetch() {
 		return new DocumentCollection(array_map(function ($item) {
 			return $item['id'];
 		}, $this->queryBuilder->execute()->fetchAll())
