@@ -6,7 +6,13 @@ use Symfony\Component\EventDispatcher;
 use Taproot\Librarian\LibrarianInterface as Events;
 use Taproot\Librarian as L;
 
-// TODO: perhaps generalise into EncodingListenerInterface
+/**
+ * JSON Listener
+ * 
+ * Listens for put and get events, encodes/decodes array <==> JSON
+ * 
+ * @todo perhaps generalise into EncodingListenerInterface
+ */
 class JsonListener implements EventDispatcher\EventSubscriberInterface {
 	public static function getSubscribedEvents() {
 		return [

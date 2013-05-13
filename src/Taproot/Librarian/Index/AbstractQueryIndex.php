@@ -3,14 +3,26 @@
 namespace Taproot\Librarian\Index;
 
 use Taproot\Librarian\Query;
+use Doctrine\DBAL;
 
+/**
+ * Abstract Query Index
+ * 
+ * Abstract base class from which all Query Indexes inherit.
+ */
 abstract class AbstractQueryIndex {
 	protected $query;
 	protected $index;
 	protected $queryBuilder;
 	protected $db;
 	
-	public function __construct($index, $db) {
+	/**
+	 * Constructor
+	 * 
+	 * @param AbstractIndex $index
+	 * @param DBAL\Connection $db
+	 */
+	public function __construct(AbstractIndex $index, DBAL\Connection $db) {
 		$this->index = $index;
 		$this->db = $db;
 	}
@@ -23,7 +35,7 @@ abstract class AbstractQueryIndex {
 		return $this->index->getName();
 	}
 	
-	public function setQueryBuilder($b) {
+	public function setQueryBuilder(DBAL\Query\QueryBuilder $b) {
 		$this->queryBuilder = $b;
 	}
 	

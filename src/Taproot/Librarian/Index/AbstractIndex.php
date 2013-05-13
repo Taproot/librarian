@@ -6,6 +6,14 @@ use Taproot\Librarian\Librarian;
 use Doctrine\DBAL;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Abstract Index
+ * 
+ * Abstract base class for Indexes. Defines a bunch of stuff which must be implemented,
+ * some generic getter/setters
+ * 
+ * @author Barnaby Walters
+ */
 abstract class AbstractIndex implements EventSubscriberInterface {
 	protected $db;
 	protected $librarian;

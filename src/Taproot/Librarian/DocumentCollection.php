@@ -5,6 +5,14 @@ namespace Taproot\Librarian;
 use Exception;
 use ArrayAccess, SeekableIterator, Countable;
 
+/**
+ * Document Collection
+ * 
+ * The object returned from Query::fetch(). Wraps an array of document IDs,
+ * lazily fetches them when they’re requested, then caches them locally.
+ * 
+ * @author Barnaby Walters
+ */
 class DocumentCollection implements ArrayAccess, SeekableIterator, Countable {
 	protected $ids = [];
 	protected $cache = [];
@@ -21,6 +29,11 @@ class DocumentCollection implements ArrayAccess, SeekableIterator, Countable {
 		return count($this->ids);
 	}
 	
+	/**
+	 * Get IDs
+	 * 
+	 * @return array An array of the IDs of documents in this collection
+	 */
 	public function getIds() {
 		return $this->ids;
 	}

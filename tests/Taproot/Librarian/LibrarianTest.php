@@ -7,6 +7,14 @@ use Taproot\Librarian\Index;
 use Doctrine\DBAL;
 use DateTime;
 
+/**
+ * Librarian Test Suite
+ * 
+ * Mainly high-level integration/acceptance tests in here.
+ * 
+ * @todo add tear down functions for clearing the environment
+ * @author Barnaby Walters
+ */
 class LibrarianTest extends \PHPUnit_Framework_TestCase {
 	private $l;
 	private $path;

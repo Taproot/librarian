@@ -6,6 +6,13 @@ use Doctrine\DBAL;
 use Taproot\Librarian\CrudEvent;
 use Taproot\Librarian\LibrarianInterface as Events;
 
+/**
+ * Tagged Index
+ * 
+ * Indexes tagged documents, allowing documents to be queried by tag.
+ * 
+ * @author Barnaby Walters
+ */
 class TaggedIndex extends AbstractIndex {
 	protected $propertyName;
 	
@@ -84,7 +91,13 @@ class TaggedIndex extends AbstractIndex {
 }
 
 class TaggedQueryIndex extends AbstractQueryIndex {
-	// TODO: handle multiple tags in string, multiple arguments
+	/**
+	 * Tagged With
+	 * 
+	 * @param string $tag
+	 * @return TaggedQueryIndex $this
+	 * @todo handle multiple tags in string, multiple arguments
+	 */
 	public function with($tag) {
 		$this->queryBuilder->andWhere($this->db->quoteIdentifier($this->index->getName())
 			. '.tag = '

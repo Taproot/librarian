@@ -9,7 +9,14 @@ use Taproot\Librarian\LibrarianInterface as Events;
 use Symfony\Component\EventDispatcher;
 use SplFileObject as File;
 
-// TODO: write CrudHandlerInterface, stick a bunch of these methods on it
+/**
+ * Filesystem CRUD Handler
+ * 
+ * A CRUD handler which saves documents to the filesystem.
+ * 
+ * @todo write CrudHandlerInterface, stick a bunch of these methods on it
+ * @todo document
+ */
 class FilesystemCrudListener implements EventDispatcher\EventSubscriberInterface {
 	private $path;
 	private $extension;

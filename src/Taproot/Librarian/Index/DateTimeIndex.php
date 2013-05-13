@@ -9,6 +9,17 @@ use Taproot\Librarian\Event;
 use Taproot\Librarian\CrudEvent;
 use Taproot\Librarian\LibrarianInterface as Events;
 
+/**
+ * DateTime Index
+ * 
+ * Indexes documents on a single DateTime property. Hydrates that property into a
+ * PHP DateTime object on document get.
+ * 
+ * It is recommended to have a DateTime index on every namespace — it makes ordering
+ * and permalink pagination a breeze.
+ * 
+ * @author Barnaby Walters
+ */
 class DateTimeIndex extends AbstractIndex {
 	private $propertyName;
 	
@@ -47,19 +58,20 @@ class DateTimeIndex extends AbstractIndex {
 		}
 	}
 	
-	// TODO: split functionality into two functions
+	// TODO: maybe split functionality into two functions
 	public function dehydratePropertyAndUpdateIndex(CrudEvent $event) {
 		$data = $event->getData();
 		
 		if (empty($data[$this->propertyName]) or !$data[$this->propertyName] instanceof DateTime)
 			return;
 		
-		// TODO: make this configurable?
 		$datetime = $data[$this->propertyName];
+		// TODO: make format configurable?
 		$data[$this->propertyName] = $datetime->format(DateTime::W3C);
 		$event->setData($data);
 		
 		// Refresh index
+		// TODO: is update quicker than delete/insert? Do we care?
 		$this->db->delete($this->getTableName(), ['id' => $event->getId()]);
 		$this->db->insert($this->getTableName(), [
 			'id' => $event->getId(),
@@ -111,6 +123,12 @@ class DateTimeIndex extends AbstractIndex {
 }
 
 class DateTimeQueryIndex extends AbstractQueryIndex implements OrderableIndexInterface {
+	
+	/**
+	 * Order By
+	 * 
+	 * @param string $direction one of 'desc', 'newestfirst' or 'reverse' (CI) for desc, otherwise asc
+	 */
 	public function orderBy($direction) {
 		if (in_array(strtolower($direction), ['desc', 'newestfirst', 'reverse']))
 			$direction = 'desc';
@@ -121,6 +139,12 @@ class DateTimeQueryIndex extends AbstractQueryIndex implements OrderableIndexInt
 			$direction);
 	}
 	
+	/**
+	 * Before
+	 * 
+	 * @param string|DateTime $datetime
+	 * @return DateTimeQueryIndex $this
+	 */
 	public function before($datetime) {
 		if (!$datetime instanceof DateTime)
 			$datetime = new DateTime($datetime);
@@ -132,6 +156,21 @@ class DateTimeQueryIndex extends AbstractQueryIndex implements OrderableIndexInt
 		return $this;
 	}
 	
+	/**
+	 * After
+	 * 
+	 * Due to the difficulties of left-justifing datetime greater-than queries in SQL,
+	 * in order to function correctly this method replaces the 'from' part of the
+	 * query with a limited, asc-ordered subquery to ensure that we’re always getting
+	 * the documents closest to $datetime.
+	 * 
+	 * As a result of this, calling ::after() on more than one DateTime index in the
+	 * same query will result in only the last one working.
+	 * 
+	 * @todo resolve above issue
+	 * @param string|DateTime $datetime
+	 * @return DateTimeQueryIndex $this
+	 */
 	public function after($datetime) {
 		if (!$datetime instanceof DateTime)
 			$datetime = new DateTime($datetime);

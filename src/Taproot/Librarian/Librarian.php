@@ -6,6 +6,13 @@ use Doctrine\DBAL;
 use Psr\Log;
 use Symfony\Component\EventDispatcher;
 
+/**
+ * Librarian
+ * 
+ * The interface through which most of Librarian is exposed.
+ * 
+ * @author Barnaby Walters
+ */
 class Librarian implements LibrarianInterface {
 	/** @var string **/
 	public $namespace;
@@ -38,7 +45,6 @@ class Librarian implements LibrarianInterface {
 			$this->dispatcher->addSubscriber($index);
 		}
 		
-		// TODO: put this elsewhere? Currently this ties Librarian to Doctrine\DBAL
 		if (isset($config['db'])) {
 			$c = $config['db'];
 			$config = new DBAL\Configuration();
@@ -136,7 +142,7 @@ class Librarian implements LibrarianInterface {
 	}
 	
 	
-	public function query($limit = 20, $orderBy = []) {
+	public function query($limit = 20, array $orderBy = []) {
 		foreach ($this->indexes as $index) {
 			$queryIndexes[$index->getName()] = $index->getQueryIndex();
 		}
