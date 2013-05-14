@@ -269,18 +269,24 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 			'tags' => ['thing', 'another']
 		]);
 		
+		$this->l->put([
+			'id' => 4,
+			'published' => '2013-05-04 12:00:00',
+			'tags' => ['web']
+		]);
+		
 		$docs = $this->l->query(2, $orderBy = ['published' => 'newestFirst'])
 			->tagged->with('web')
 			->fetch();
 		
-		$this->assertEquals([2, 1], $docs->getIds());
+		$this->assertEquals([4, 2], $docs->getIds());
 		
 		$docs = $this->l->query(2, $orderBy = ['published' => 'newestFirst'])
 			->published->after('2013-05-01 15:00:00')
 			->tagged->with('web')
 			->fetch();
 		
-		$this->assertEquals([2], $docs->getIds());
+		$this->assertEquals([2, 4], $docs->getIds());
 	}
 	
 	public function testDoctrineQueryBuilderHandlesJoinsCorrectly() {
