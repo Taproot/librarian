@@ -243,11 +243,11 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		
 		$this->assertEquals([4, 3], $docs->getIds());
 		
-		$docs = $this->l->query(2, $orderBy = ['published' => 'newestFirst'])
+		$docs = $this->l->query(2, $orderBy = ['published' => 'oldestFirst'])
 			->published->after('2013-05-02 12:00:00')
 			->fetch();
 		
-		$this->assertEquals([3, 2], $docs->getIds());
+		$this->assertEquals([2, 3], $docs->getIds());
 	}
 	
 	public function testTaggedIndexJoinsCorrectly() {
@@ -281,7 +281,7 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		
 		$this->assertEquals([4, 2], $docs->getIds());
 		
-		$docs = $this->l->query(2, $orderBy = ['published' => 'newestFirst'])
+		$docs = $this->l->query(2, $orderBy = ['published' => 'oldestFirst'])
 			->published->after('2013-05-01 15:00:00')
 			->tagged->with('web')
 			->fetch();
