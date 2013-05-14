@@ -38,6 +38,19 @@ class DocumentCollection implements ArrayAccess, SeekableIterator, Countable {
 		return $this->ids;
 	}
 	
+	/**
+	 * Revese
+	 * 
+	 * Reverses the order of documents in the collection, resets the cursor
+	 * 
+	 * @return DocumentCollection $this
+	 */
+	public function reverse() {
+		$this->ids = array_reverse($this->ids);
+		$this->cursor = 0;
+		return $this;
+	}
+	
 	public function current() {
 		return $this->offsetGet($this->cursor);
 	}

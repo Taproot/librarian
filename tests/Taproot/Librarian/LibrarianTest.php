@@ -13,6 +13,7 @@ use DateTime;
  * Mainly high-level integration/acceptance tests in here.
  * 
  * @todo add tear down functions for clearing the environment
+ * @todo split this up into different test suites
  * @author Barnaby Walters
  */
 class LibrarianTest extends \PHPUnit_Framework_TestCase {
@@ -314,5 +315,23 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		
 		$this->assertEquals('SELECT * FROM (select * from inner_table) t LEFT JOIN othertable o ON o.id = t.id WHERE t.thing = "value"',
 			$qb->getSql());
+	}
+	
+	public function testDocumentCollectionReverse() {
+		$this->l->put([
+			'id' => 1,
+			'published' => '2013-05-01 12:00:00'
+		]);
+		
+		$this->l->put([
+			'id' => 2,
+			'published' => '2013-05-02 12:00:00'
+		]);
+		
+		$docs = $this->l->query(2, $orderBy = ['published' => 'oldestFirst'])->fetch();
+		$this->assertEquals([1, 2], $docs->getIds());
+		
+		$docs->reverse();
+		$this->assertEquals([2, 1], $docs->getIds());
 	}
 }
