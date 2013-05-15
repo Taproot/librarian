@@ -1,25 +1,25 @@
 {
-    "name": "taproot/librarian",
-    "description": "An event-driven flat file CRUD system with Doctrine DBAL based indexes",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Barnaby Walters",
-            "email": "barnaby@waterpigs.co.uk"
-        }
-    ],
-    "autoload": {
-    	"psr-0": {
-    		"Taproot\\Librarian": "src"
-    	}
-    },
-    "require": {
+	"name": "taproot/librarian",
+	"description": "An event-driven flat file CRUD system with Doctrine DBAL based indexes",
+	"license": "MIT",
+	"authors": [
+		{
+					"name": "Barnaby Walters",
+					"email": "barnaby@waterpigs.co.uk"
+		}
+	],
+	"autoload": {
+		"psr-0": {
+			"Taproot\\Librarian": "src"
+		}
+	},
+	"require": {
 			"doctrine/dbal": "2.3.*",
 			"symfony/event-dispatcher": "2.2.*",
 			"psr/log": "1.*"
-    },
-    "require-dev": {
-    	"phpunit/phpunit": "3.7.*",
-    	"monolog/monolog": "1.5.*"
-    }
+	},
+	"require-dev": {
+		"phpunit/phpunit": "3.7.*",
+		"monolog/monolog": "1.5.*"
+	}
 }
