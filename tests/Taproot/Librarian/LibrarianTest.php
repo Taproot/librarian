@@ -18,10 +18,19 @@ use DateTime;
  */
 class LibrarianTest extends \PHPUnit_Framework_TestCase {
 	private $l;
+	private $crud;
 	private $path;
 	
 	public static function setUpBeforeClass() {
 		date_default_timezone_set('UTC');
+	}
+	
+	public function clearEnvironment() {
+		foreach ($this->crud->getAllDocumentPaths() as $path) {
+			unlink($path);
+		}
+		
+		$this->l->clearIndexes();
 	}
 	
 	public function setUp() {
@@ -43,13 +52,13 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		]);
 		
 		// TODO: put this setup code somewhere more abstract perhaps
-		$crud = new L\Listener\FilesystemCrudListener([
+		$this->crud = new L\Listener\FilesystemCrudListener([
 			'path' => $this->path,
 			'extension' => '.json',
 			'idField' => 'id'
 		]);
 		
-		$this->l->setCrudHandler($crud);
+		$this->l->setCrudHandler($this->crud);
 		
 		$jL = new L\Listener\JsonListener();
 		
@@ -57,8 +66,7 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 	}
 	
 	public function testDataCanBeSaved() {
-		if (file_exists($this->path . '1.json'))
-			unlink($this->path . '1.json');
+		$this->clearEnvironment();
 		
 		$data = [
 			'id' => '1',
@@ -122,9 +130,7 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 	}
 	
 	public function testBuildEnvironmentCausesPathFolderToBeCreated() {
-		foreach (glob($this->path . '*') as $path) {
-			unlink($path);
-		}
+		$this->clearEnvironment();
 		
 		rmdir($this->path);
 		
@@ -136,6 +142,8 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 	}
 	
 	public function testBuildEnvironmentCreatesIndexTables() {
+		$this->clearEnvironment();
+		
 		$db = $this->l->getConn();
 		
 		$db->executeQuery('DROP TABLE IF EXISTS test_datetime_index_published_on_published');
@@ -159,6 +167,8 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 	
 	// TODO: split this up into multiple tests
 	public function testBuildIndexesAddsRowForExistingDocument() {
+		$this->clearEnvironment();
+		
 		$this->l->put([
 			'id' => 1,
 			'published' => new DateTime('2013-05-09 09:42:29')
@@ -193,6 +203,8 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 	}
 	
 	public function testDateTimeQueryOrderBy() {
+		$this->clearEnvironment();
+		
 		$this->l->put([
 			'id' => 1,
 			'published' => new DateTime('2013-05-01 12:00:00')
@@ -218,6 +230,8 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 	}
 	
 	public function testDateTimeBeforeAfterPagination() {
+		$this->clearEnvironment();
+		
 		$this->l->put([
 			'id' => 1,
 			'published' => new DateTime('2013-05-01 12:00:00')
@@ -252,6 +266,8 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 	}
 	
 	public function testTaggedIndexJoinsCorrectly() {
+		$this->clearEnvironment();
+		
 		$this->l->put([
 			'id' => 1,
 			'published' => '2013-05-01 12:00:00',
@@ -291,6 +307,8 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 	}
 	
 	public function testDoctrineQueryBuilderHandlesJoinsCorrectly() {
+		//$this->clearEnvironment();
+		
 		$db = DBAL\DriverManager::getConnection([
 			'name' => 'waterpigs_co_uk_test',
 			'username' => 'test',
@@ -318,6 +336,8 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 	}
 	
 	public function testDocumentCollectionReverse() {
+		//$this->clearEnvironment();
+		
 		$this->l->put([
 			'id' => 1,
 			'published' => '2013-05-01 12:00:00'

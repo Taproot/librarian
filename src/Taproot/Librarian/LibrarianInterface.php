@@ -8,6 +8,7 @@ interface LibrarianInterface {
 	const DELETE_EVENT = 'crud.delete';
 	const BUILD_ENVIRONMENT_EVENT = 'environment.build';
 	const BUILD_INDEXES = 'indexes.build';
+	const CLEAR_INDEXES = 'indexes.clear';
 	
 	/**
 	 * Constructor
@@ -28,8 +29,18 @@ interface LibrarianInterface {
 	 * Iterates through all known documents and rebuilds any out of date indexes. Ideal
 	 * for running on fresh data or after a server migration. Not something you want to
 	 * run all the time, it can take a while.
+	 * 
+	 * This method resets+rebuilds indexes for each existing document but will not remove
+	 * records for deleted documents. Use LibrarianInterface::clearIndexes for that.
 	 */
 	public function buildIndexes();
+	
+	/**
+	 * Clear Indexes
+	 * 
+	 * Removes all index records from the database.
+	 */
+	public function clearIndexes();
 	
 	/**
 	 * Get Item

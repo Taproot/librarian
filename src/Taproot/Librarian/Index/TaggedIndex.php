@@ -17,9 +17,9 @@ class TaggedIndex extends AbstractIndex {
 	protected $propertyName;
 	
 	public static function getSubscribedEvents() {
-		return [
-			Events::PUT_EVENT => ['onPutEvent', 100]
-		];
+		return array_merge(parent::getSubscribedEvents(), [
+				Events::PUT_EVENT => ['onPutEvent', 100]
+			]);
 	}
 	
 	public function __construct($propertyName) {
@@ -49,7 +49,7 @@ class TaggedIndex extends AbstractIndex {
 		return $this->updateIndex($data, $id);
 	}
 	
-	public function updateIndex($data, $id) {
+	public function updateIndex(array $data, $id) {
 		// Remove records currently associated with this id
 		$this->db->delete($this->getTableName(), ['id' => $id]);
 		
@@ -83,7 +83,7 @@ class TaggedIndex extends AbstractIndex {
 		// The index is out of date, so load the document and update it
 		$data = $this->librarian->get($id);
 		
-		if (empty($data[$this->propertyName]) or !$data[$this->propertyName] instanceof DateTime)
+		if (empty($data[$this->propertyName]) or !is_array($data[$this->propertyName]))
 			return;
 		
 		$this->updateIndex($data, $id);

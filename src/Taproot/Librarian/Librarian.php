@@ -3,6 +3,7 @@
 namespace Taproot\Librarian;
 
 use Doctrine\DBAL;
+use PDO;
 use Psr\Log;
 use Symfony\Component\EventDispatcher;
 
@@ -54,17 +55,26 @@ class Librarian implements LibrarianInterface {
 		
 		if (isset($config['db'])) {
 			$c = $config['db'];
-			$config = new DBAL\Configuration();
-			$connectionParams = [
-				'dbname' => @($c['dbname'] ?: $c['name'] ?: $c['database'] ?: $c['db'] ?: null),
-				'user' => @($c['user'] ?: $c['username'] ?: null),
-				'password' => @($c['password'] ?: null),
-				'host' => @($c['host'] ?: null),
-				'path' => @($c['path'] ?: null),
-				'driver' => $c['driver']
-			];
 			
-			$this->db = DBAL\DriverManager::getConnection($connectionParams, $config);
+			if (!$c instanceof DBAL\Connection) {
+				if ($c instanceof PDO)
+					$connectionParams = ['pdo' => $c];
+				else
+					$connectionParams = [
+						'dbname' => @($c['dbname'] ?: $c['name'] ?: $c['database'] ?: $c['db'] ?: null),
+						'user' => @($c['user'] ?: $c['username'] ?: null),
+						'password' => @($c['password'] ?: null),
+						'host' => @($c['host'] ?: null),
+						'path' => @($c['path'] ?: null),
+						'driver' => @($c['driver'] ?: null),
+						'driverClass' => @($c['driverClass'] ?: null)
+					];
+				
+				$config = new DBAL\Configuration();
+				$this->db = DBAL\DriverManager::getConnection($connectionParams, $config);
+			} else {
+				$this->db = $c;
+			}
 			
 			foreach ($this->indexes as $index) {
 				$index->setConnection($this->db);
@@ -127,6 +137,11 @@ class Librarian implements LibrarianInterface {
 		// TODO: will this ever do anything?
 		$event = new Event($this);
 		$this->dispatcher->dispatch(self::BUILD_INDEXES, $event);
+	}
+	
+	public function clearIndexes() {
+		$event = new Event($this);
+		$this->dispatcher->dispatch(self::CLEAR_INDEXES, $event);
 	}
 	
 	public function get($id) {

@@ -2,7 +2,8 @@
 
 namespace Taproot\Librarian\Index;
 
-use Taproot\Librarian\Librarian;
+use Taproot\Librarian\Event;
+use Taproot\Librarian\LibrarianInterface;
 use Doctrine\DBAL;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -20,7 +21,9 @@ abstract class AbstractIndex implements EventSubscriberInterface {
 	protected $name;
 	
 	public static function getSubscribedEvents() {
-		return [];
+		return [
+			LibrarianInterface::CLEAR_INDEXES => 'clearIndex'
+		];
 	}
 	
 	abstract public function getQueryIndex();
@@ -35,7 +38,7 @@ abstract class AbstractIndex implements EventSubscriberInterface {
 		$this->db = $conn;
 	}
 	
-	public function setLibrarian(Librarian $l) {
+	public function setLibrarian(LibrarianInterface $l) {
 		$this->librarian = $l;
 	}
 	
@@ -45,5 +48,9 @@ abstract class AbstractIndex implements EventSubscriberInterface {
 	
 	public function getName() {
 		return $this->name;
+	}
+	
+	public function clearIndex(Event $event = null) {
+		$this->db->delete($this->getTableName(), ['true']);
 	}
 }

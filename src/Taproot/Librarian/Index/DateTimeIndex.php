@@ -24,12 +24,12 @@ class DateTimeIndex extends AbstractIndex {
 	private $propertyName;
 	
 	public static function getSubscribedEvents() {
-		return [
-			// Turn the datetime property into a DateTime object after unserialisation
-			Events::GET_EVENT => ['hydrateProperty', -100],
-			// Turn the datetime property into a string if it’s a DateTime
-			Events::PUT_EVENT => ['dehydratePropertyAndUpdateIndex', 100]
-		];
+		return array_merge(parent::getSubscribedEvents(), [
+				// Turn the datetime property into a DateTime object after unserialisation
+				Events::GET_EVENT => ['hydrateProperty', -100],
+				// Turn the datetime property into a string if it’s a DateTime
+				Events::PUT_EVENT => ['dehydratePropertyAndUpdateIndex', 100]
+			]);
 	}
 	
 	public function __construct($propertyName) {
@@ -62,10 +62,14 @@ class DateTimeIndex extends AbstractIndex {
 	public function dehydratePropertyAndUpdateIndex(CrudEvent $event) {
 		$data = $event->getData();
 		
-		if (empty($data[$this->propertyName]) or !$data[$this->propertyName] instanceof DateTime)
+		if (empty($data[$this->propertyName]))
 			return;
+			
+		if (!$data[$this->propertyName] instanceof DateTime)
+			$datetime = new DateTime($data[$this->propertyName]);
+		else
+			$datetime = $data[$this->propertyName];
 		
-		$datetime = $data[$this->propertyName];
 		// TODO: make format configurable?
 		$data[$this->propertyName] = $datetime->format(DateTime::W3C);
 		$event->setData($data);
