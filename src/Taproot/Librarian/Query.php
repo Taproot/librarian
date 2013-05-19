@@ -12,7 +12,7 @@ class Query {
 	private $db;
 	
 	/** @var DBAL\Query\QueryBuilder */
-	private $queryBuilder;
+	public $queryBuilder;
 	
 	/** @var LibrarianInterface */
 	private $librarian;
@@ -71,10 +71,15 @@ class Query {
 	 * @return DocumentCollection A collection of the documents returned by the query
 	 */
 	public function fetch() {
-		return new DocumentCollection(array_map(function ($item) {
+		$pluckIds = function ($item) {
 			return $item['id'];
-		}, $this->queryBuilder->execute()->fetchAll())
-		, $this->librarian);
+		};
+		
+		$results = $this->queryBuilder->execute()->fetchAll();
+		
+		$ids = array_map($pluckIds, $results);
+		
+		return new DocumentCollection($ids, $this->librarian);
 	}
 	
 	public function __isset($id) {

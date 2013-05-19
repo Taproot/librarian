@@ -354,4 +354,17 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		$docs->reverse();
 		$this->assertEquals([2, 1], $docs->getIds());
 	}
+	
+	public function testDocumentCollectionCountIsZeroForEmptyQueries() {
+		$this->clearEnvironment();
+		
+		$this->l->put([
+			'id' => 1,
+			'published' => '2013-05-01 12:00:00'
+		]);
+		
+		$matches = $this->l->query(1, $orderBy = ['published' => 'newestFirst'])->fetch();
+		
+		$earliestDateTime = $matches->first();
+	}
 }

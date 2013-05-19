@@ -10,7 +10,13 @@ class DocumentCollectionTest extends \PHPUnit_Framework_TestCase {
 	public $l;
 	
 	public function setUp() {
-		$this->l = new Librarian('test', [], []);
+		$this->l = $this->getMockBuilder('Taproot\Librarian\Librarian')
+			->disableOriginalConstructor()
+			->getMock();
+			
+		$this->l->expects($this->any())
+			->method('get')
+			->will($this->returnArgument(0));
 	}
 	
 	public function testCountsCorrectly() {
@@ -79,5 +85,11 @@ class DocumentCollectionTest extends \PHPUnit_Framework_TestCase {
 		
 		$c->rewind();
 		$this->assertEquals(0, $c->key());
+	}
+	
+	public function testShouldReturnFirstItem() {
+		$c = new DocumentCollection([1, 2, 3, 4], $this->l);
+		
+		$this->assertEquals(1, $c->first());
 	}
 }

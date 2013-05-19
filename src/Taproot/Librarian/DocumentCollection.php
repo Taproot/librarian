@@ -39,7 +39,7 @@ class DocumentCollection implements ArrayAccess, SeekableIterator, Countable {
 	}
 	
 	/**
-	 * Revese
+	 * Reverse
 	 * 
 	 * Reverses the order of documents in the collection, resets the cursor
 	 * 
@@ -49,6 +49,10 @@ class DocumentCollection implements ArrayAccess, SeekableIterator, Countable {
 		$this->ids = array_reverse($this->ids);
 		$this->cursor = 0;
 		return $this;
+	}
+	
+	public function first() {
+		return $this->offsetGet(0);
 	}
 	
 	public function current() {
