@@ -307,7 +307,7 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 	}
 	
 	public function testDoctrineQueryBuilderHandlesJoinsCorrectly() {
-		//$this->clearEnvironment();
+		$this->clearEnvironment();
 		
 		$db = DBAL\DriverManager::getConnection([
 			'name' => 'waterpigs_co_uk_test',
@@ -336,7 +336,7 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 	}
 	
 	public function testDocumentCollectionReverse() {
-		//$this->clearEnvironment();
+		$this->clearEnvironment();
 		
 		$this->l->put([
 			'id' => 1,
