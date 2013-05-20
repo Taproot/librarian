@@ -4,8 +4,8 @@
 	"license": "MIT",
 	"authors": [
 		{
-					"name": "Barnaby Walters",
-					"email": "barnaby@waterpigs.co.uk"
+			"name": "Barnaby Walters",
+			"email": "barnaby@waterpigs.co.uk"
 		}
 	],
 	"autoload": {
