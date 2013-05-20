@@ -3,7 +3,7 @@
 namespace Taproot\Librarian;
 
 use Exception;
-use ArrayAccess, SeekableIterator, Countable;
+use ArrayAccess, SeekableIterator, Countable, RuntimeException;
 
 /**
  * Document Collection
@@ -17,12 +17,23 @@ class DocumentCollection implements ArrayAccess, SeekableIterator, Countable {
 	protected $ids = [];
 	protected $cache = [];
 	protected $cursor = 0;
-	protected $librarian;
+	protected $getter;
 	
-	public function __construct(array $ids, Librarian $librarian) {
+	/**
+	 * Constructor
+	 * 
+	 * @todo maybe accept a callable for the second argument, to ease testing and reuse?
+	 */
+	public function __construct(array $ids, $getter) {
 		// Make sure numbering of $ids is predictable
 		$this->ids = array_values($ids);
-		$this->librarian = $librarian;
+		
+		if ($getter instanceof LibrarianInterface)
+			$this->getter = [$getter, 'get'];
+		elseif (is_callable($getter))
+			$this->getter = $getter;
+		else
+			return new RuntimeException('The second argument must a callable or an instance of LibrarianInterface');
 	}
 	
 	public function count() {
@@ -98,8 +109,10 @@ class DocumentCollection implements ArrayAccess, SeekableIterator, Countable {
 	}
 	
 	public function offsetGet($offset) {
+		$getter = $this->getter;
+		
 		if (!isset($this->cache[$offset]))
-			$this->cache[$offset] = $this->librarian->get($this->ids[$offset]);
+			$this->cache[$offset] = $getter($this->ids[$offset]);
 		
 		return $this->cache[$offset];
 	}
