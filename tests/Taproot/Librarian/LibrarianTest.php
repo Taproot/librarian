@@ -365,6 +365,41 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		
 		$matches = $this->l->query(1, $orderBy = ['published' => 'newestFirst'])->fetch();
 		
-		$earliestDateTime = $matches->first();
+		$earliestDateTime = $matches->last()['published'];
+		
+		$matches = $this->l->query(1, $orderBy = ['published' => 'newestFirst'])
+			->published->before($earliestDateTime)
+			->fetch();
+		
+		$this->assertEquals(0, count($matches));
+	}
+	
+	public function testFilteredPaginationWorkflow() {
+		$this->clearEnvironment();
+		
+		foreach (range(1, 10) as $item) {
+			$this->l->put([
+				'id' => $item,
+				'published' => '2013-05-' . str_pad($item, 2, '0', STR_PAD_LEFT) . ' 12:00:00',
+				'tags' => $item % 2 == 0 ? ['web'] : ['personal']
+			]);
+		}
+		
+		$baseQuery = $this->l->query(2, $orderBy = ['published' => 'newestFirst']);
+		$baseQuery->tagged->with('web');
+		
+		$shownQuery = clone $baseQuery;
+		$beforeQuery = clone $baseQuery;
+		$afterQuery = clone $baseQuery;
+		
+		$shown = $shownQuery->published->before('2013-05-07')->fetch();
+		
+		$this->assertEquals([6, 4], $shown->getIds());
+		
+		$earlierResults = $beforeQuery->limit(1)->published->before($shown->last()['published'])->fetch();
+		$laterResults = $afterQuery->limit(1)->published->after($shown->first()['published'])->fetch();
+		
+		$this->assertEquals([2], $earlierResults->getIds());
+		$this->assertEquals([8], $laterResults->getIds());
 	}
 }

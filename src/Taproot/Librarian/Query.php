@@ -6,22 +6,22 @@ use Doctrine\DBAL;
 use Exception;
 
 class Query {
-	private $indexes = [];
+	protected $indexes = [];
 	
 	/** @var DBAL\Connection */
-	private $db;
+	protected $db;
 	
-	/** @var DBAL\Query\QueryBuilder */
-	public $queryBuilder;
+	/** @var QueryBuilder */
+	protected $queryBuilder;
 	
 	/** @var LibrarianInterface */
-	private $librarian;
+	protected $librarian;
 	
 	/** @var Index\AbstractIndex */
-	private $mainIndex;
+	protected $mainIndex;
 	
-	/** @var int */
-	private $limit;
+	/** @var int TODO: is this actually required? */
+	protected $limit;
 	
 	/**
 	 * Constructor
@@ -38,7 +38,7 @@ class Query {
 		$this->db = $db;
 		$this->limit = $limit;
 		
-		$this->queryBuilder = $this->db->createQueryBuilder();
+		$this->queryBuilder = new QueryBuilder($this->db);
 		$this->queryBuilder->setMaxResults($limit);
 		
 		foreach ($this->indexes as $index) {
@@ -63,6 +63,18 @@ class Query {
 		foreach ($orderBy as $name => $direction) {
 			$this->indexes[$name]->orderBy($direction);
 		}
+	}
+	
+	public function __clone() {
+		// Ensure that changes made to one Query’s QueryBuilder do not affect cloned Queries
+		$this->queryBuilder = clone $this->queryBuilder;
+	}
+	
+	public function limit($number) {
+		assert('is_int($number)');
+		$this->limit = $number;
+		$this->queryBuilder->setMaxResults($number);
+		return $this;
 	}
 	
 	/**
