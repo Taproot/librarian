@@ -385,12 +385,13 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 			]);
 		}
 		
-		$baseQuery = $this->l->query(2, $orderBy = ['published' => 'newestFirst']);
-		$baseQuery->tagged->with('web');
+		$shownQuery = $this->l->query(2, $orderBy = ['published' => 'newestFirst']);
+		$beforeQuery = $this->l->query(2, $orderBy = ['published' => 'newestFirst']);		
+		$afterQuery = $this->l->query(2, $orderBy = ['published' => 'oldestFirst']);
 		
-		$shownQuery = clone $baseQuery;
-		$beforeQuery = clone $baseQuery;
-		$afterQuery = clone $baseQuery;
+		array_map(function ($query) {
+			$query->tagged->with('web');
+		}, [$shownQuery, $beforeQuery, $afterQuery]);
 		
 		$shown = $shownQuery->published->before('2013-05-07')->fetch();
 		

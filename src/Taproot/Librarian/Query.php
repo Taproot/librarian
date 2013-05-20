@@ -12,7 +12,7 @@ class Query {
 	protected $db;
 	
 	/** @var QueryBuilder */
-	protected $queryBuilder;
+	public $queryBuilder;
 	
 	/** @var LibrarianInterface */
 	protected $librarian;
