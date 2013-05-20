@@ -38,9 +38,9 @@ class YamlListener implements EventDispatcher\EventSubscriberInterface {
 	public function encode(L\CrudEvent $event) {
 		$data = $event->getData();
 		
-		$serialiser = $this->serialise;
+		$s = $this->serialise;
 			
-		$event->setData($serialise($data));
+		$event->setData($s($data));
 	}
 	
 	public function decode(L\CrudEvent $event) {
