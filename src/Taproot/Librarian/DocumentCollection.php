@@ -64,6 +64,14 @@ class DocumentCollection implements ArrayAccess, SeekableIterator, Countable {
 		return $this;
 	}
 	
+	public function filterIds($function)  {
+		assert('is_callable($function)');
+		
+		$this->ids = array_values(array_filter($this->ids, $function));
+		
+		return $this;
+	}
+	
 	public function current() {
 		return $this->offsetGet($this->cursor);
 	}
