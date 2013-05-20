@@ -8,18 +8,13 @@
 					"email": "barnaby@waterpigs.co.uk"
 		}
 	],
-	"repositories": [{
-		"type": "vcs",
-		"url": "https://github.com/barnabywalters/dbal"
-	}],
 	"autoload": {
 		"psr-0": {
 			"Taproot\\Librarian": "src"
 		}
 	},
 	"require": {
-			"doctrine/common": "2.4.*@beta",
-			"doctrine/dbal": "dev-patch-1",
+			"doctrine/dbal": "*",
 			"symfony/event-dispatcher": "2.2.*",
 			"psr/log": "1.*"
 	},
