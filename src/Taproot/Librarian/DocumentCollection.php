@@ -55,6 +55,10 @@ class DocumentCollection implements ArrayAccess, SeekableIterator, Countable {
 		return $this->offsetGet(0);
 	}
 	
+	public function last() {
+		return $this->offsetGet(count($this->ids) - 1);
+	}
+	
 	public function current() {
 		return $this->offsetGet($this->cursor);
 	}

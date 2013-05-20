@@ -91,5 +91,6 @@ class DocumentCollectionTest extends \PHPUnit_Framework_TestCase {
 		$c = new DocumentCollection([1, 2, 3, 4], $this->l);
 		
 		$this->assertEquals(1, $c->first());
+		$this->assertEquals(4, $c->last());
 	}
 }
