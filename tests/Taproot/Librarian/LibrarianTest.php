@@ -386,8 +386,8 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		}
 		
 		$shownQuery = $this->l->query(2, $orderBy = ['published' => 'newestFirst']);
-		$beforeQuery = $this->l->query(2, $orderBy = ['published' => 'newestFirst']);		
-		$afterQuery = $this->l->query(2, $orderBy = ['published' => 'oldestFirst']);
+		$beforeQuery = $this->l->query(1, $orderBy = ['published' => 'newestFirst']);		
+		$afterQuery = $this->l->query(1, $orderBy = ['published' => 'oldestFirst']);
 		
 		array_map(function ($query) {
 			$query->tagged->with('web');
@@ -397,8 +397,8 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		
 		$this->assertEquals([6, 4], $shown->getIds());
 		
-		$earlierResults = $beforeQuery->limit(1)->published->before($shown->last()['published'])->fetch();
-		$laterResults = $afterQuery->limit(1)->published->after($shown->first()['published'])->fetch();
+		$earlierResults = $beforeQuery->published->before($shown->last()['published'])->fetch();
+		$laterResults = $afterQuery->published->after($shown->first()['published'])->fetch();
 		
 		$this->assertEquals([2], $earlierResults->getIds());
 		$this->assertEquals([8], $laterResults->getIds());
