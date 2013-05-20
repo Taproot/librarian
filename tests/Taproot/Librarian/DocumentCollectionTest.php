@@ -93,4 +93,11 @@ class DocumentCollectionTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals(1, $c->first());
 		$this->assertEquals(4, $c->last());
 	}
+	
+	public function testShuffleRandomisesItems() {
+		$ids = [1, 2, 3, 4];
+		$c = new DocumentCollection($ids, $this->l);
+		$c->shuffle();
+		$this->assertNotEquals($ids, $c->getIds());
+	}
 }
