@@ -71,7 +71,12 @@ class DocumentCollection implements ArrayAccess, SeekableIterator, Countable {
 	}
 	
 	public function shuffle() {
+		$oldIds = $this->ids;
 		shuffle($this->ids);
+		
+		if ($oldIds == $this->ids)
+			$this->shuffle();
+		
 		return $this;
 	}
 	
@@ -79,6 +84,23 @@ class DocumentCollection implements ArrayAccess, SeekableIterator, Countable {
 		assert('is_callable($function)');
 		
 		$this->ids = array_values(array_filter($this->ids, $function));
+		
+		return $this;
+	}
+	
+	public function filter($function) {
+		assert('is_callable($function)');
+		$getter = [$this, 'offsetGet'];
+		
+		$filterable = array_map(function($id, $key) {
+			return [$key, $id];
+		}, $this->ids, array_keys($this->ids));
+		
+		$filtered = array_values(array_filter($filterable, function ($f) use ($function, $getter) {
+			return $function($getter($f[0]));
+		}));
+		
+		$this->ids = array_map(function ($f) { return $f[1]; }, $filtered);
 		
 		return $this;
 	}

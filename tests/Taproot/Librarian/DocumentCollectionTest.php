@@ -111,11 +111,21 @@ class DocumentCollectionTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals([2, 4], $c->getIds());
 	}
 	
-	public function testFilterShouldFilterByAnonymousFunction() {
+	public function testConstructorShouldAcceptCallable() {
 		$c = new DocumentCollection([1, 2, 3, 4], function ($id) {
 			return ['id' => $id];
 		});
 		
+		$this->assertEquals(['id' => 2], $c[1]);
+	}
+	
+	public function testFilterShouldFilterItemsByCallable() {
+		$c = new DocumentCollection([1, 2, 3, 4], function ($id) { return ['id' => $id]; });
 		
+		$c->filter(function ($doc) {
+			return $doc['id'] % 2 == 0;
+		});
+		
+		$this->assertEquals([2, 4], $c->getIds());
 	}
 }
