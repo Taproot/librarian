@@ -100,4 +100,14 @@ class DocumentCollectionTest extends \PHPUnit_Framework_TestCase {
 		$c->shuffle();
 		$this->assertNotEquals($ids, $c->getIds());
 	}
+	
+	public function testFilterIdsShouldFilterByAnonymousFunction() {
+		$c = new DocumentCollection([1, 2, 3, 4], $this->l);
+		
+		$c->filterIds(function ($id) {
+			return $id % 2 == 0;
+		});
+		
+		$this->assertEquals([2, 4], $c->getIds());
+	}
 }
