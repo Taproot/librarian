@@ -53,6 +53,36 @@ class Librarian implements LibrarianInterface {
 			$this->dispatcher->addSubscriber($index);
 		}
 		
+		// CRUD auto config
+		// Encoder
+		if (isset($config['type']) and $config['type'] !== 'json') {
+			$t = strtolower($config['type']);
+			
+			if ($t === 'yaml') {
+				$enc = new Listener\YamlListener;
+				$extension = 'yaml';
+			}
+		} else {
+			$enc = new Listener\JsonListener;
+			$extension = 'json';
+		}
+		
+		$this->dispatcher->addSubscriber($enc);
+		
+		// Handler
+		if (isset($config['crud'])) {
+			$this->setCrudHandler($config['crud']);
+		} else {
+			$crud = new Listener\FilesystemCrudListener([
+				'path' => @($config['path'] ?: sys_get_temp_dir()),
+				'idField' => @($config['idField'] ?: 'id'),
+				'extension' => $extension
+			]);
+			
+			$this->setCrudHandler($crud);
+		}
+		
+		// Database Config
 		if (isset($config['db'])) {
 			$c = $config['db'];
 			
@@ -85,6 +115,12 @@ class Librarian implements LibrarianInterface {
 	public function setCrudHandler($crudHandler) {
 		$this->crud = $crudHandler;
 		$this->dispatcher->addSubscriber($this->crud);
+		
+		return $this;
+	}
+	
+	public function getCrudHandler() {
+		return $this->crud;
 	}
 	
 	public function getConn() {

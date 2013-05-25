@@ -44,25 +44,16 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 				'password' => 'test',
 				'host' => '127.0.0.1',
 				'driver' => 'pdo_mysql'
-			]
+			],
+			'path' => $this->path,
+			'type' => 'json'
 		],
 		[
 			'published' => new Index\DateTimeIndex('published'),
 			'tagged' => new Index\TaggedIndex('tags')
 		]);
 		
-		// TODO: put this setup code somewhere more abstract perhaps
-		$this->crud = new L\Listener\FilesystemCrudListener([
-			'path' => $this->path,
-			'extension' => '.json',
-			'idField' => 'id'
-		]);
-		
-		$this->l->setCrudHandler($this->crud);
-		
-		$jL = new L\Listener\JsonListener();
-		
-		$this->l->dispatcher->addSubscriber($jL);
+		$this->crud = $this->l->getCrudHandler();
 	}
 	
 	public function testDataCanBeSaved() {
