@@ -26,6 +26,7 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 	}
 	
 	public function clearEnvironment() {
+		// ensure there is an environment which is safe to clear
 		$this->l->buildEnvironment();
 		
 		foreach ($this->crud->getAllDocumentPaths() as $path) {
@@ -396,5 +397,21 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		
 		$this->assertEquals([2], $earlierResults->getIds());
 		$this->assertEquals([8], $laterResults->getIds());
+	}
+	
+	public function testStringIndexMatches() {
+		$this->clearEnvironment();
+		
+		$this->l->put([
+			'id' => 1,
+			'published' => new DateTime(),
+			'name' => 'hello'
+		]);
+		
+		$docs = $this->l->query(1, $orderBy = ['published' => 'newestFirst'])
+			->name->matches('hello')
+			->fetch();
+		
+		$this->assertEquals(1, count($docs));
 	}
 }
