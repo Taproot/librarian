@@ -413,5 +413,33 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 			->fetch();
 		
 		$this->assertEquals(1, count($docs));
+		$this->assertEquals('hello', $docs->first()['name']);
+	}
+	
+	public function testStringIndexesCanBeOrdered() {
+		$this->clearEnvironment();
+		
+		$this->l->put([
+			'id' => 1,
+			'published' => new DateTime(),
+			'name' => 'cucumber'
+		]);
+		
+		$this->l->put([
+			'id' => 2,
+			'published' => new DateTime(),
+			'name' => 'aardvark'
+		]);
+		
+		$this->l->put([
+			'id' => 3,
+			'published' => new DateTime(),
+			'name' => 'banana'
+		]);
+		
+		$docs = $this->l->query(20, $orderBy = ['name' => 'alphabetical'])
+			->fetch();
+		
+		$this->asserEquals(3, count($docs));
 	}
 }
