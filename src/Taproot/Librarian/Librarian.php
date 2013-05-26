@@ -58,7 +58,7 @@ class Librarian implements LibrarianInterface {
 		if (isset($config['type']) and $config['type'] !== 'json') {
 			$t = strtolower($config['type']);
 			
-			if ($t === 'yaml') {
+			if ($t == 'yaml') {
 				$enc = new Listener\YamlListener;
 				$extension = 'yaml';
 			}

@@ -20,6 +20,7 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 	private $l;
 	private $crud;
 	private $path;
+	private $db;
 	
 	public static function setUpBeforeClass() {
 		date_default_timezone_set('UTC');
@@ -39,15 +40,16 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 	public function setUp() {
 		parent::setUp();
 		$this->path = realpath(__DIR__ . '/../../') . '/tmp_test_data/';
+		$this->db = [
+			'name' => 'waterpigs_co_uk_test',
+			'username' => 'test',
+			'password' => 'test',
+			'host' => '127.0.0.1',
+			'driver' => 'pdo_mysql'
+		];
 		
 		$this->l = new L\Librarian('test', [
-			'db' => [
-				'name' => 'waterpigs_co_uk_test',
-				'username' => 'test',
-				'password' => 'test',
-				'host' => '127.0.0.1',
-				'driver' => 'pdo_mysql'
-			],
+			'db' => $this->db,
 			'path' => $this->path,
 			'type' => 'json'
 		],
@@ -58,6 +60,25 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		]);
 		
 		$this->crud = $this->l->getCrudHandler();
+	}
+	
+	public function testYamlListenerSavesCorrectly() {
+		$this->clearEnvironment();
+		
+		$l = new L\Librarian('test', [
+			'db' => $this->db,
+			'path' => $this->path,
+			'type' => 'yaml'
+		], []);
+		
+		$l->put([
+			'id' => '1',
+			'name' => 'Thing'
+		]);
+		
+		$result = $l->get('1');
+		
+		$this->assertEquals('Thing', $result['name']);
 	}
 	
 	public function testDataCanBeSaved() {

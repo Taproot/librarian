@@ -30,8 +30,8 @@ class YamlListener implements EventDispatcher\EventSubscriberInterface {
 			$this->unserialise = 'yaml_parse';
 		}
 		else {
-			$this->serialise = ['Symfony\Component\Yaml\Yaml', 'parse'];
-			$this->unserialise = ['Symfony\Component\Yaml\Yaml', 'dump'];
+			$this->serialise = ['Symfony\Component\Yaml\Yaml', 'dump'];
+			$this->unserialise = ['Symfony\Component\Yaml\Yaml', 'parse'];
 		}
 	}
 	
