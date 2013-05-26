@@ -445,4 +445,10 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals('banana', $docs[1]['name']);
 		$this->assertEquals('cucumber', $docs[2]['name']);
 	}
+	
+	public function testStringIndexExactlyMatches() {
+		$this->clearEnvironment();
+		
+		$this->markTestSkipped('TODO: implement me');
+	}
 }
