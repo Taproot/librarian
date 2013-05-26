@@ -89,9 +89,15 @@ class StringIndex extends AbstractIndex {
 	}
 }
 
-class StringQueryIndex extends AbstractQueryIndex { // implements OrderableIndexInterface {
+class StringQueryIndex extends AbstractQueryIndex implements OrderableIndexInterface {
 	public function orderBy($direction) {
-		$this->queryBuilder->orderBy();
+		if (!in_array($direction, ['alphabetical', 'asc', 'ascending']))
+			$direction = 'desc';
+		else
+			$direction = 'asc';
+		
+		$this->queryBuilder->orderBy($this->db->quoteIdentifier($this->index->getName()) . '.content',
+			$direction);
 	}
 	
 	public function matches($match) {

@@ -440,6 +440,9 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		$docs = $this->l->query(20, $orderBy = ['name' => 'alphabetical'])
 			->fetch();
 		
-		$this->asserEquals(3, count($docs));
+		$this->assertEquals(3, count($docs));
+		$this->assertEquals('aardvark', $docs[0]['name']);
+		$this->assertEquals('banana', $docs[1]['name']);
+		$this->assertEquals('cucumber', $docs[2]['name']);
 	}
 }
