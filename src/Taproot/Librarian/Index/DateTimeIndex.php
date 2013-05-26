@@ -92,6 +92,9 @@ class DateTimeIndex extends AbstractIndex {
 		$table->addIndex(['id', 'datetime']);
 	}
 	
+	/**
+	 * @todo make this logic generic to share it across different indexes
+	 */
 	public function update($id, $lastModified) {
 		// Delete any rows for this item which were indexed before $lastModified
 		assert(!empty($lastModified));

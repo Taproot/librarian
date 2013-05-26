@@ -26,6 +26,8 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 	}
 	
 	public function clearEnvironment() {
+		$this->l->buildEnvironment();
+		
 		foreach ($this->crud->getAllDocumentPaths() as $path) {
 			unlink($path);
 		}
@@ -50,7 +52,8 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		],
 		[
 			'published' => new Index\DateTimeIndex('published'),
-			'tagged' => new Index\TaggedIndex('tags')
+			'tagged' => new Index\TaggedIndex('tags'),
+			'name' => new Index\StringIndex('name')
 		]);
 		
 		$this->crud = $this->l->getCrudHandler();
