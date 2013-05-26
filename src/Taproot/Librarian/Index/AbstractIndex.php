@@ -13,6 +13,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * Abstract base class for Indexes. Defines a bunch of stuff which must be implemented,
  * some generic getter/setters
  * 
+ * @todo make updating a record on save a subscribed event and abstract method by default
+ * 
  * @author Barnaby Walters
  */
 abstract class AbstractIndex implements EventSubscriberInterface {

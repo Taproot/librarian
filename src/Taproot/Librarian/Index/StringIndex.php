@@ -3,6 +3,8 @@
 namespace Taproot\Librarian\Index;
 
 use Doctrine\DBAL;
+use Taproot\Librarian\LibrarianInterface as Events;
+use Taproot\Librarian\CrudEvent;
 
 class StringIndex extends AbstractIndex {
 	protected $propertyName;
@@ -10,7 +12,7 @@ class StringIndex extends AbstractIndex {
 	
 	public static function getSubscribedEvents() {
 		return array_merge(parent::getSubscribedEvents(), [
-		
+			Events::PUT_EVENT => ['onPut', 100]
 		]);
 	}
 	
@@ -36,6 +38,21 @@ class StringIndex extends AbstractIndex {
 		$table->addColumn('last_indexed', 'integer', ['length' => 50]);
 		
 		$table->addIndex(['id', 'content']);
+	}
+	
+	public function onPut(CrudEvent $event) {
+		$data = $event->getData();
+		
+		$this->db->delete($this->getTableName(), ['id' => $event->getId()]);
+		
+		if (!isset($data[$this->propertyName]))
+			return;
+		
+		$this->db->insert($this->getTableName(), [
+			'id' => $event->getId(),
+			'content' => $data[$this->propertyName],
+			'last_indexed' => time()
+		]);
 	}
 	
 	public function update($id, $lastModified) {
@@ -75,5 +92,15 @@ class StringIndex extends AbstractIndex {
 class StringQueryIndex extends AbstractQueryIndex { // implements OrderableIndexInterface {
 	public function orderBy($direction) {
 		$this->queryBuilder->orderBy();
+	}
+	
+	public function matches($match) {
+		$name = $this->db->quoteIdentifier($this->index->getName());
+		
+		$this->queryBuilder->andWhere($name
+			. '.content = '
+			. $this->db->quote($match));
+		
+		return $this;
 	}
 }

@@ -62,6 +62,7 @@ class DateTimeIndex extends AbstractIndex {
 	public function dehydratePropertyAndUpdateIndex(CrudEvent $event) {
 		$data = $event->getData();
 		
+		// TODO: better idea to remove the index here?
 		if (empty($data[$this->propertyName]))
 			return;
 			
