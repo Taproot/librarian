@@ -108,7 +108,7 @@ class UrlQueryIndex extends AbstractQueryIndex implements OrderableIndexInterfac
 		return $this;
 	}
 	
-	public function hasHostname($host) {
+	public function domainMatches($host) {
 		$name = $this->db->quoteIdentifier($this->index->getName());
 		
 		$this->queryBuilder->andWhere($name

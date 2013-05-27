@@ -484,7 +484,7 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		]);
 		
 		$docs = $this->l->query(1, $orderBy = ['published' => 'newestFirst'])
-			->url->hasHostname('example.org')
+			->url->domainMatches('example.org')
 			->fetch();
 		
 		$this->assertEquals(1, count($docs));
