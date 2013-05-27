@@ -31,7 +31,7 @@ class TaggedIndex extends AbstractIndex {
 	}
 	
 	public function getTableName() {
-		return $this->librarian->namespace . '_tagged_index_' . $this->getName() . '_on_' . $this->propertyName;
+		return strtolower($this->librarian->namespace . '_tagged_index_' . $this->getName() . '_on_' . $this->propertyName);
 	}
 	
 	public function makeTableRepresentation(DBAL\Schema\Table $table) {

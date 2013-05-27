@@ -41,7 +41,7 @@ class DateTimeIndex extends AbstractIndex {
 	}
 	
 	public function getTableName() {
-		return $this->librarian->namespace . '_datetime_index_' . $this->name . '_on_' . $this->propertyName;
+		return strtolower($this->librarian->namespace . '_datetime_index_' . $this->name . '_on_' . $this->propertyName);
 	}
 	
 	public function hydrateProperty(CrudEvent $event) {

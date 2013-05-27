@@ -12,7 +12,7 @@ class UrlIndex extends StringIndex {
 	}
 	
 	public function getTableName() {
-		return $this->librarian->namespace . '_string_index_' . $this->name . '_on_' . $this->propertyName;
+		return strtolower($this->librarian->namespace . '_string_index_' . $this->name . '_on_' . $this->propertyName);
 	}
 	
 	public function makeTableRepresentation(DBAL\Schema\Table $table) {
