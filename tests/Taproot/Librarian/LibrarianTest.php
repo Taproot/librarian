@@ -56,7 +56,8 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		[
 			'published' => new Index\DateTimeIndex('published'),
 			'tagged' => new Index\TaggedIndex('tags'),
-			'name' => new Index\StringIndex('name')
+			'name' => new Index\StringIndex('name'),
+			'url' => new Index\UrlIndex('url')
 		]);
 		
 		$this->crud = $this->l->getCrudHandler();
@@ -471,5 +472,22 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		$this->clearEnvironment();
 		
 		$this->markTestSkipped('TODO: implement me');
+	}
+	
+	public function testUrlIndexMatchesHostname() {
+		$this->clearEnvironment();
+		
+		$this->l->put([
+			'id' => 1,
+			'published' => new DateTime(),
+			'url' => 'http://example.org/path'
+		]);
+		
+		$docs = $this->l->query(1, $orderBy = ['published' => 'newestFirst'])
+			->url->hasHostname('example.org')
+			->fetch();
+		
+		$this->assertEquals(1, count($docs));
+		$this->assertEquals('http://example.org/path', $docs[0]['url']);
 	}
 }

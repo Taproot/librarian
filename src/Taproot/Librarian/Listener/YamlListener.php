@@ -8,7 +8,7 @@ use Taproot\Librarian\LibrarianInterface as Events;
 use Taproot\Librarian as L;
 
 /**
- * JAML Listener
+ * YAML Listener
  * 
  * Listens for put and get events, encodes/decodes array <==> YAML
  * 

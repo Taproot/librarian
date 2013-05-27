@@ -6,38 +6,24 @@ use Doctrine\DBAL;
 use Taproot\Librarian\LibrarianInterface as Events;
 use Taproot\Librarian\CrudEvent;
 
-class StringIndex extends AbstractIndex {
-	protected $propertyName;
-	protected $length;
-	
-	public static function getSubscribedEvents() {
-		return array_merge(parent::getSubscribedEvents(), [
-			Events::PUT_EVENT => ['onPut', 100]
-		]);
-	}
-	
-	/** 
-	 * @todo is 200 a sensible defaul length?
-	 */
-	public function __construct($propertyName, $length = 200) {
-		$this->propertyName = $propertyName;
-		$this->length = $length;
-	}
-	
+class UrlIndex extends StringIndex {
 	public function getQueryIndex() {
-		return new StringQueryIndex($this, $this->db);
-	}
-	
-	public function getTableName() {
-		return $this->librarian->namespace . '_string_index_' . $this->name . '_on_' . $this->propertyName;
+		return new UrlQueryIndex($this, $this->db);
 	}
 	
 	public function makeTableRepresentation(DBAL\Schema\Table $table) {
 		$table->addColumn('id', 'string', ['length' => 30]);
-		$table->addColumn('content', 'string', ['length' => $this->length]);
+		$table->addColumn('raw', 'string', ['length' => $this->length]);
+		$table->addColumn('scheme', 'string', ['length' => 30]);
+		$table->addColumn('domain', 'string', ['length' => 50]);
+		$table->addColumn('port', 'integer', ['length' => 10]);
+		$table->addColumn('path', 'string', ['length' => 200]);
+		$table->addColumn('fragment', 'string', ['length' => 100]);
+		
 		$table->addColumn('last_indexed', 'integer', ['length' => 50]);
 		
-		$table->addIndex(['id', 'content']);
+		$table->addIndex(['id', 'raw']);
+		$table->addIndex(['id', 'domain']);
 	}
 	
 	public function onPut(CrudEvent $event) {
@@ -48,9 +34,16 @@ class StringIndex extends AbstractIndex {
 		if (!isset($data[$this->propertyName]))
 			return;
 		
+		$parts = parse_url($data[$this->propertyName]);
+		
 		$this->db->insert($this->getTableName(), [
 			'id' => $event->getId(),
-			'content' => $data[$this->propertyName],
+			'raw' => $data[$this->propertyName],
+			'scheme' => @($parts['scheme'] ?: ''),
+			'domain' => $parts['host'],
+			'port' => @($parts['port'] ?: ''),
+			'path' => @($parts['path'] ?: ''),
+			'fragment' => @($parts['fragment'] ?: ''),
 			'last_indexed' => time()
 		]);
 	}
@@ -81,23 +74,27 @@ class StringIndex extends AbstractIndex {
 		
 		$now = time();
 		
-		// TODO: test this, current tests not covering it
 		$this->db->insert($this->getTableName(), [
 			'id' => $id,
-			'content' => $data[$this->propertyName],
+			'raw' => $data[$this->propertyName],
+			'scheme' => @($parts['scheme'] ?: ''),
+			'domain' => $parts['host'],
+			'port' => @($parts['port'] ?: ''),
+			'path' => @($parts['path'] ?: ''),
+			'fragment' => @($parts['fragment'] ?: ''),
 			'last_indexed' => $now
 		]);
 	}
 }
 
-class StringQueryIndex extends AbstractQueryIndex implements OrderableIndexInterface {
+class UrlQueryIndex extends AbstractQueryIndex implements OrderableIndexInterface {
 	public function orderBy($direction) {
 		if (!in_array($direction, ['alphabetical', 'asc', 'ascending']))
 			$direction = 'desc';
 		else
 			$direction = 'asc';
 		
-		$this->queryBuilder->orderBy($this->db->quoteIdentifier($this->index->getName()) . '.content',
+		$this->queryBuilder->orderBy($this->db->quoteIdentifier($this->index->getName()) . '.raw',
 			$direction);
 	}
 	
@@ -105,8 +102,18 @@ class StringQueryIndex extends AbstractQueryIndex implements OrderableIndexInter
 		$name = $this->db->quoteIdentifier($this->index->getName());
 		
 		$this->queryBuilder->andWhere($name
-			. '.content = '
+			. '.raw = '
 			. $this->db->quote($match));
+		
+		return $this;
+	}
+	
+	public function hasHostname($host) {
+		$name = $this->db->quoteIdentifier($this->index->getName());
+		
+		$this->queryBuilder->andWhere($name
+			. '.domain = '
+			. $this->db->quote($host));
 		
 		return $this;
 	}
