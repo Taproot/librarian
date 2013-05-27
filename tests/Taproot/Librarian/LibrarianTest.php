@@ -474,7 +474,7 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		$this->markTestSkipped('TODO: implement me');
 	}
 	
-	public function testUrlIndexMatchesHostname() {
+	public function testUrlIndexDomainMatches() {
 		$this->clearEnvironment();
 		
 		$this->l->put([
@@ -489,5 +489,28 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 		
 		$this->assertEquals(1, count($docs));
 		$this->assertEquals('http://example.org/path', $docs[0]['url']);
+	}
+	
+	public function testUrlIndexHasDomain() {
+		$this->clearEnvironment();
+		
+		$this->l->put([
+			'id' => 1,
+			'published' => new DateTime(),
+			'url' => ''
+		]);
+		
+		$this->l->put([
+			'id' => 2,
+			'published' => new DateTime(),
+			'url' => 'http://example.com'
+		]);
+		
+		$docs = $this->l->query(2, $orderBy = ['published' => 'newestFirst'])
+			->url->hasDomain()
+			->fetch();
+		
+		$this->assertEquals(1, count($docs));
+		$this->assertEquals(2, $docs[0]['id']);
 	}
 }

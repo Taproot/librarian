@@ -12,7 +12,7 @@ class UrlIndex extends StringIndex {
 	}
 	
 	public function getTableName() {
-		return strtolower($this->librarian->namespace . '_string_index_' . $this->name . '_on_' . $this->propertyName);
+		return strtolower($this->librarian->namespace . '_url_index_' . $this->name . '_on_' . $this->propertyName);
 	}
 	
 	public function makeTableRepresentation(DBAL\Schema\Table $table) {
@@ -118,6 +118,15 @@ class UrlQueryIndex extends AbstractQueryIndex implements OrderableIndexInterfac
 		$this->queryBuilder->andWhere($name
 			. '.domain = '
 			. $this->db->quote($host));
+		
+		return $this;
+	}
+	
+	public function hasDomain() {
+		$name = $this->db->quoteIdentifier($this->index->getName());
+		
+		$this->queryBuilder->andWhere($name
+			. '.domain != ""');
 		
 		return $this;
 	}
