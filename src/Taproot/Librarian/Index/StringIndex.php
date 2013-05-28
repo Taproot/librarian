@@ -33,7 +33,7 @@ class StringIndex extends AbstractIndex {
 	}
 	
 	public function makeTableRepresentation(DBAL\Schema\Table $table) {
-		$table->addColumn('id', 'string', ['length' => 30]);
+		$table->addColumn('id', 'string', ['length' => 100]);
 		$table->addColumn('content', 'string', ['length' => $this->length]);
 		$table->addColumn('last_indexed', 'integer', ['length' => 50]);
 		

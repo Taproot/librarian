@@ -16,7 +16,7 @@ class UrlIndex extends StringIndex {
 	}
 	
 	public function makeTableRepresentation(DBAL\Schema\Table $table) {
-		$table->addColumn('id', 'string', ['length' => 30]);
+		$table->addColumn('id', 'string', ['length' => 100]);
 		$table->addColumn('raw', 'string', ['length' => $this->length]);
 		$table->addColumn('scheme', 'string', ['length' => 30]);
 		$table->addColumn('domain', 'string', ['length' => 50]);
