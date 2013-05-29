@@ -27,7 +27,7 @@ class YamlListener implements EventDispatcher\EventSubscriberInterface {
 	public function __construct() {
 		if (extension_loaded('yaml')) {
 			ini_set('yaml.output_width', -1);
-			$this->serialise = function ($data) { yaml_emit($data, YAML_UTF8_ENCODING); };
+			$this->serialise = function ($data) { return yaml_emit($data, YAML_UTF8_ENCODING); };
 			$this->unserialise = 'yaml_parse';
 		}
 		else {
