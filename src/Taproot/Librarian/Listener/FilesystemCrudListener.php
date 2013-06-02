@@ -25,8 +25,8 @@ class FilesystemCrudListener implements EventDispatcher\EventSubscriberInterface
 	public static function getSubscribedEvents() {
 		return [
 			Events::PUT_EVENT => [
-				['saveToFilesystem', 0], // Save the serialized data to a file
-				['setEventItemId', 500] // Get the ID out from the data whilst it’s an array
+				['setEventItemId', 500], // Get the ID out from the data whilst it’s an array
+				['saveToFilesystem', 0] // Save the serialized data to a file
 			],
 			Events::GET_EVENT => [
 				['getFromFilesystem', 0], // Get the raw data from the file

@@ -24,7 +24,8 @@ abstract class AbstractIndex implements EventSubscriberInterface {
 	
 	public static function getSubscribedEvents() {
 		return [
-			LibrarianInterface::CLEAR_INDEXES => 'clearIndex'
+			LibrarianInterface::CLEAR_INDEXES => 'onClearIndex',
+			LibrarianInterface::DELETE_EVENT => 'onDelete'
 		];
 	}
 	
@@ -54,7 +55,13 @@ abstract class AbstractIndex implements EventSubscriberInterface {
 			: $this->name;
 	}
 	
-	public function clearIndex(Event $event = null) {
+	public function onClearIndex(Event $event = null) {
 		$this->db->delete($this->getTableName(), ['true']);
+	}
+	
+	public function onDelete(Event $event) {
+		$id = $event->getData();
+		
+		$this->db->delete($this->getTableName(), ['id' => $id]);
 	}
 }
