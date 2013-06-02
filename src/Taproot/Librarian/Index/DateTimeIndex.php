@@ -131,7 +131,6 @@ class DateTimeIndex extends AbstractIndex {
 }
 
 class DateTimeQueryIndex extends AbstractQueryIndex implements OrderableIndexInterface {
-	
 	/**
 	 * Order By
 	 * 
@@ -143,7 +142,7 @@ class DateTimeQueryIndex extends AbstractQueryIndex implements OrderableIndexInt
 		else
 			$direction = 'asc';
 		
-		$this->queryBuilder->orderBy($this->db->quoteIdentifier($this->index->getName()) . '.datetime',
+		$this->queryBuilder->orderBy($this->getName() . '.datetime',
 			$direction);
 	}
 	
@@ -157,7 +156,7 @@ class DateTimeQueryIndex extends AbstractQueryIndex implements OrderableIndexInt
 		if (!$datetime instanceof DateTime)
 			$datetime = new DateTime($datetime);
 		
-		$this->queryBuilder->andWhere($this->db->quoteIdentifier($this->index->getName())
+		$this->queryBuilder->andWhere($this->getName()
 			. '.datetime < "'
 			. $datetime->format('Y-m-d H:i:s') . '"');
 		
@@ -175,7 +174,7 @@ class DateTimeQueryIndex extends AbstractQueryIndex implements OrderableIndexInt
 		if (!$datetime instanceof DateTime)
 			$datetime = new DateTime($datetime);
 		
-		$name = $this->db->quoteIdentifier($this->index->getName());
+		$name = $this->getName();
 		
 		$this->queryBuilder->andWhere($name
 			. '.datetime > '

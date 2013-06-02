@@ -50,15 +50,15 @@ class Query {
 		$this->mainIndex = current($this->indexes);
 		
 		foreach (array_slice($this->indexes, 1) as $name => $index) {
-			$this->queryBuilder->leftJoin($this->mainIndex->getName(), $index->getTableName(), $name,
-				$this->db->quoteIdentifier($this->mainIndex->getName())
+			$this->queryBuilder->leftJoin($this->mainIndex->getName(), $index->getTableName(), $index->getName($quote = true),
+				$this->mainIndex->getName()
 				. '.id = '
 				. $this->db->quoteIdentifier($name)
 				. '.id');
 		}
 		
-		$this->queryBuilder->select('distinct ' . $this->db->quoteIdentifier($this->mainIndex->getName()) . '.id')
-			->from($this->mainIndex->getTableName(), $this->mainIndex->getName());
+		$this->queryBuilder->select('distinct ' . $this->mainIndex->getName() . '.id')
+			->from($this->mainIndex->getTableName(), $this->mainIndex->getName($quote = true));
 		
 		foreach ($orderBy as $name => $direction) {
 			$this->indexes[$name]->orderBy($direction);

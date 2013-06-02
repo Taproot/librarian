@@ -98,12 +98,12 @@ class UrlQueryIndex extends AbstractQueryIndex implements OrderableIndexInterfac
 		else
 			$direction = 'asc';
 		
-		$this->queryBuilder->orderBy($this->db->quoteIdentifier($this->index->getName()) . '.raw',
+		$this->queryBuilder->orderBy($this->getName() . '.raw',
 			$direction);
 	}
 	
 	public function matches($match) {
-		$name = $this->db->quoteIdentifier($this->index->getName());
+		$name = $this->getName();
 		
 		$this->queryBuilder->andWhere($name
 			. '.raw = '
@@ -113,7 +113,7 @@ class UrlQueryIndex extends AbstractQueryIndex implements OrderableIndexInterfac
 	}
 	
 	public function domainMatches($host) {
-		$name = $this->db->quoteIdentifier($this->index->getName());
+		$name = $this->getName();
 		
 		$this->queryBuilder->andWhere($name
 			. '.domain = '
@@ -123,7 +123,7 @@ class UrlQueryIndex extends AbstractQueryIndex implements OrderableIndexInterfac
 	}
 	
 	public function hasDomain() {
-		$name = $this->db->quoteIdentifier($this->index->getName());
+		$name = $this->getName();
 		
 		$this->queryBuilder->andWhere($name
 			. '.domain != ""');

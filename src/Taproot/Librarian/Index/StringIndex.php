@@ -97,12 +97,12 @@ class StringQueryIndex extends AbstractQueryIndex implements OrderableIndexInter
 		else
 			$direction = 'asc';
 		
-		$this->queryBuilder->orderBy($this->db->quoteIdentifier($this->index->getName()) . '.content',
+		$this->queryBuilder->orderBy($this->getName() . '.content',
 			$direction);
 	}
 	
 	public function matches($match) {
-		$name = $this->db->quoteIdentifier($this->index->getName());
+			$name = $this->getName();
 		
 		$this->queryBuilder->andWhere($name
 			. '.content = '

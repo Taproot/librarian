@@ -57,7 +57,8 @@ class LibrarianTest extends \PHPUnit_Framework_TestCase {
 			'published' => new Index\DateTimeIndex('published'),
 			'tagged' => new Index\TaggedIndex('tags'),
 			'name' => new Index\StringIndex('name'),
-			'url' => new Index\UrlIndex('url')
+			'url' => new Index\UrlIndex('url'),
+			'from' => new Index\StringIndex('from')
 		]);
 		
 		$this->crud = $this->l->getCrudHandler();

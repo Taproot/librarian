@@ -31,7 +31,7 @@ class TaggedIndex extends AbstractIndex {
 	}
 	
 	public function getTableName() {
-		return strtolower($this->librarian->namespace . '_tagged_index_' . $this->getName() . '_on_' . $this->propertyName);
+		return strtolower($this->librarian->namespace . '_tagged_index_' . $this->getName($quote=false) . '_on_' . $this->propertyName);
 	}
 	
 	public function makeTableRepresentation(DBAL\Schema\Table $table) {
@@ -99,7 +99,7 @@ class TaggedQueryIndex extends AbstractQueryIndex {
 	 * @todo handle multiple tags in string, multiple arguments
 	 */
 	public function with($tag) {
-		$this->queryBuilder->andWhere($this->db->quoteIdentifier($this->index->getName())
+		$this->queryBuilder->andWhere($this->index->getName($quote = true)
 			. '.tag = '
 			. $this->db->quote($tag));
 		

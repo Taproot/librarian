@@ -28,11 +28,11 @@ abstract class AbstractQueryIndex {
 	}
 	
 	public function getTableName() {
-		return $this->index->getTableName();
+		return $this->db->quoteIdentifier($this->index->getTableName());
 	}
 	
 	public function getName() {
-		return $this->index->getName();
+		return $this->db->quoteIdentifier($this->index->getName());
 	}
 	
 	public function setQueryBuilder(DBAL\Query\QueryBuilder $b) {

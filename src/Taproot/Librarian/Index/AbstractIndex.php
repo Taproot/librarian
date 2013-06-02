@@ -48,8 +48,10 @@ abstract class AbstractIndex implements EventSubscriberInterface {
 		$this->name = $name;
 	}
 	
-	public function getName() {
-		return $this->name;
+	public function getName($quote = false) {
+		return $quote
+			? $this->db->quoteIdentifier($this->name)
+			: $this->name;
 	}
 	
 	public function clearIndex(Event $event = null) {

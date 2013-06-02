@@ -47,12 +47,6 @@ class Librarian implements LibrarianInterface {
 		$this->dispatcher = new EventDispatcher\EventDispatcher();
 		$this->logger = new Log\NullLogger();
 		
-		foreach ($this->indexes as $name => $index) {
-			$index->setName($name);
-			$index->setLibrarian($this);
-			$this->dispatcher->addSubscriber($index);
-		}
-		
 		// CRUD auto config
 		// Encoder
 		if (isset($config['type']) and $config['type'] !== 'json') {
@@ -106,8 +100,11 @@ class Librarian implements LibrarianInterface {
 				$this->db = $c;
 			}
 			
-			foreach ($this->indexes as $index) {
+			foreach ($this->indexes as $name => $index) {
 				$index->setConnection($this->db);
+				$index->setName($name);
+				$index->setLibrarian($this);
+				$this->dispatcher->addSubscriber($index);
 			}
 		}
 	}
@@ -202,7 +199,7 @@ class Librarian implements LibrarianInterface {
 	
 	public function query($limit = 20, array $orderBy = []) {
 		foreach ($this->indexes as $index) {
-			$queryIndexes[$index->getName()] = $index->getQueryIndex();
+			$queryIndexes[$index->getName($quote = false)] = $index->getQueryIndex();
 		}
 		
 		return new Query($this, $this->db, $limit, $orderBy, $queryIndexes);
