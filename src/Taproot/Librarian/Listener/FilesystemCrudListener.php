@@ -95,7 +95,10 @@ class FilesystemCrudListener implements EventDispatcher\EventSubscriberInterface
 	
 	public function deleteFromFilesystem(CrudEvent $event) {
 		$id = $event->getData();
-		unlink($this->pathForId($id));
+		
+		if (file_exists($this->pathForId($id)))
+			unlink($this->pathForId($id));
+		
 		clearstatcache();
 	}
 	
