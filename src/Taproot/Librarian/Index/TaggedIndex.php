@@ -30,10 +30,6 @@ class TaggedIndex extends AbstractIndex {
 		return new TaggedQueryIndex($this, $this->db);
 	}
 	
-	public function getTableName() {
-		return strtolower($this->librarian->namespace . '_tagged_index_' . $this->getName($quote=false) . '_on_' . $this->propertyName);
-	}
-	
 	public function makeTableRepresentation(DBAL\Schema\Table $table) {
 		$table->addColumn('id', 'string', ['length' => 100]);
 		$table->addColumn('tag', 'string', ['length' => 100]);

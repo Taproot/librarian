@@ -2,6 +2,7 @@
 
 namespace Taproot\Librarian\Index;
 
+use BarnabyWalters\Helpers\Helpers as H;
 use Taproot\Librarian\Event;
 use Taproot\Librarian\LibrarianInterface;
 use Doctrine\DBAL;
@@ -31,7 +32,9 @@ abstract class AbstractIndex implements EventSubscriberInterface {
 	
 	abstract public function getQueryIndex();
 	
-	abstract public function getTableName();
+	public function getTableName() {
+		return H::toAscii(strtolower($this->librarian->namespace . '_datetime_index_' . $this->name . '_on_' . $this->propertyName), ['-'], $delimeter = '_');
+	}
 	
 	abstract public function makeTableRepresentation(DBAL\Schema\Table $table);
 	

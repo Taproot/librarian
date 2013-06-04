@@ -28,10 +28,6 @@ class StringIndex extends AbstractIndex {
 		return new StringQueryIndex($this, $this->db);
 	}
 	
-	public function getTableName() {
-		return strtolower($this->librarian->namespace . '_string_index_' . $this->name . '_on_' . $this->propertyName);
-	}
-	
 	public function makeTableRepresentation(DBAL\Schema\Table $table) {
 		$table->addColumn('id', 'string', ['length' => 100]);
 		$table->addColumn('content', 'string', ['length' => $this->length]);

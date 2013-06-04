@@ -11,10 +11,6 @@ class UrlIndex extends StringIndex {
 		return new UrlQueryIndex($this, $this->db);
 	}
 	
-	public function getTableName() {
-		return strtolower($this->librarian->namespace . '_url_index_' . $this->name . '_on_' . $this->propertyName);
-	}
-	
 	public function makeTableRepresentation(DBAL\Schema\Table $table) {
 		$table->addColumn('id', 'string', ['length' => 100]);
 		$table->addColumn('raw', 'string', ['length' => $this->length]);

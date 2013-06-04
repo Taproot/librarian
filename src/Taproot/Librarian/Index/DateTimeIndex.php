@@ -21,7 +21,7 @@ use Taproot\Librarian\LibrarianInterface as Events;
  * @author Barnaby Walters
  */
 class DateTimeIndex extends AbstractIndex {
-	private $propertyName;
+	protected $propertyName;
 	
 	public static function getSubscribedEvents() {
 		return array_merge(parent::getSubscribedEvents(), [
@@ -38,10 +38,6 @@ class DateTimeIndex extends AbstractIndex {
 	
 	public function getQueryIndex() {
 		return new DateTimeQueryIndex($this, $this->db);
-	}
-	
-	public function getTableName() {
-		return strtolower($this->librarian->namespace . '_datetime_index_' . $this->name . '_on_' . $this->propertyName);
 	}
 	
 	public function hydrateProperty(CrudEvent $event) {
