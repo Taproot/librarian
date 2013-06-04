@@ -33,7 +33,9 @@ abstract class AbstractIndex implements EventSubscriberInterface {
 	abstract public function getQueryIndex();
 	
 	public function getTableName() {
-		return H::toAscii(strtolower($this->librarian->namespace . '_datetime_index_' . $this->name . '_on_' . $this->propertyName), ['-'], $delimeter = '_');
+		$classPathFilename = pathinfo(str_replace('\\', '/', get_class($this)), PATHINFO_FILENAME);
+		$indexName = strtolower(preg_replace('/Index$/', '', $classPathFilename));
+		return H::toAscii(strtolower($this->librarian->namespace . '_' . $indexName . '_index_' . $this->name . '_on_' . $this->propertyName), ['-'], $delimeter = '_');
 	}
 	
 	abstract public function makeTableRepresentation(DBAL\Schema\Table $table);
