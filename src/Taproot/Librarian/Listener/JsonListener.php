@@ -21,6 +21,10 @@ class JsonListener implements EventDispatcher\EventSubscriberInterface {
 		];
 	}
 	
+	public static function getExtension() {
+		return 'json';
+	}
+	
 	public function encodeJson(L\CrudEvent $event) {
 		$data = $event->getData();
 		$json = json_encode($data, JSON_PRETTY_PRINT);

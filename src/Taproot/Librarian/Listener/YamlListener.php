@@ -24,6 +24,10 @@ class YamlListener implements EventDispatcher\EventSubscriberInterface {
 		];
 	}
 	
+	public static function getExtension() {
+		return 'yaml';
+	}
+	
 	public function __construct() {
 		if (extension_loaded('yaml')) {
 			ini_set('yaml.output_width', -1);
