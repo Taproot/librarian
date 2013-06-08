@@ -53,7 +53,10 @@ class Librarian implements LibrarianInterface {
 			$t = strtolower($config['type']);
 			
 			if ($t == 'yaml') {
-				$enc = new Listener\YamlListener;
+				$enc = new Listener\SymfonyYamlListener;
+				$extension = 'yaml';
+			} elseif ($t == 'lib-yaml') {
+				$enc = new Listener\LibYamlListener;
 				$extension = 'yaml';
 			}
 		} else {

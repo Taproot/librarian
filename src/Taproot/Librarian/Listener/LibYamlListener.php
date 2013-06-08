@@ -2,7 +2,6 @@
 
 namespace Taproot\Librarian\Listener;
 
-use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\EventDispatcher;
 use Taproot\Librarian\LibrarianInterface as Events;
 use Taproot\Librarian as L;
@@ -14,7 +13,7 @@ use Taproot\Librarian as L;
  * 
  * @author Barnaby Walters
  */
-class YamlListener implements EventDispatcher\EventSubscriberInterface {
+class LibYamlListener implements EventDispatcher\EventSubscriberInterface {
 	public $serialise;
 	
 	public static function getSubscribedEvents() {
@@ -29,30 +28,23 @@ class YamlListener implements EventDispatcher\EventSubscriberInterface {
 	}
 	
 	public function __construct() {
-		if (extension_loaded('yaml')) {
-			ini_set('yaml.output_width', -1);
-			$this->serialise = function ($data) { return yaml_emit($data, YAML_UTF8_ENCODING); };
-			$this->unserialise = 'yaml_parse';
-		}
-		else {
-			$this->serialise = ['Symfony\Component\Yaml\Yaml', 'dump'];
-			$this->unserialise = ['Symfony\Component\Yaml\Yaml', 'parse'];
-		}
+		if (!extension_loaded('yaml'))
+			throw new Exception('LibYamlListener: requires the yaml extension to function, maybe try SymfonyYamlListener?');
 	}
 	
 	public function encode(L\CrudEvent $event) {
 		$data = $event->getData();
 		
-		$s = $this->serialise;
+		$data = yaml_emit($data, YAML_UTF8_ENCODING);
 			
-		$event->setData($s($data));
+		$event->setData($data);
 	}
 	
 	public function decode(L\CrudEvent $event) {
 		$in = $event->getData();
 		
-		$us = $this->unserialise;
+		$data = yaml_parse($in);
 		
-		$event->setData($us($in));
+		$event->setData($data);
 	}
 }
