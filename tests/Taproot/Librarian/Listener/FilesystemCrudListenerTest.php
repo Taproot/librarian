@@ -34,4 +34,19 @@ class FilesystemCrudListenerTest extends \PHPUnit_Framework_TestCase {
 		rmdir($l->getPath());
 		rmdir(dirname($l->getPath()));
 	}
+	
+	public function testGetAllDocumentPathsReturnsEmptyArrayIfNoDocumentsFound() {
+		$l = new FilesystemCrudListener([
+			'path' => __DIR__ . '/../../../tmp_test_data/nonexistant-folder/another-nonexistant-folder',
+			'extension' => '.json',
+			'idField' => 'id'
+		]);
+		
+		$l->ensurePathExists();
+		
+		$this->assertEquals([], $l->getAllDocumentPaths());
+		
+		rmdir($l->getPath());
+		rmdir(dirname($l->getPath()));
+	}
 }
