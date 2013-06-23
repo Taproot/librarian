@@ -131,6 +131,9 @@ class DocumentCollection implements ArrayAccess, SeekableIterator, Countable {
 	}
 	
 	public function offsetGet($offset) {
+		if (!$this->offsetExists($offset))
+			return null;
+		
 		$getter = $this->getter;
 		
 		if (!isset($this->cache[$offset]))
