@@ -4,6 +4,7 @@ namespace Taproot\Librarian\Index;
 
 use DateTime;
 use Doctrine\DBAL;
+use Exception;
 use Taproot\Librarian\Librarian;
 use Taproot\Librarian\Event;
 use Taproot\Librarian\CrudEvent;
