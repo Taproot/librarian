@@ -4,3 +4,4 @@ composer.phar
 /tests/tmp_test_data/
 /docs
 /tmp
+/nbproject/private/
