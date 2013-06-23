@@ -53,7 +53,7 @@ class FilesystemCrudListener implements EventDispatcher\EventSubscriberInterface
 		
 		while (($entry = readdir($dir)) !== false) {
 			$path = realpath($this->path . $entry);
-			if ($entry == '.' or $entry == '..' or is_dir($path))
+			if ($entry == '.' or $entry == '..' or is_dir($path) or $entry == '.DS_Store')
 				continue;
 			
 			$paths[$this->idForFilename($entry)] = $path;
