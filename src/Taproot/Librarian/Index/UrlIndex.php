@@ -69,10 +69,12 @@ class UrlIndex extends StringIndex {
 		// The index is out of date, so load the document and update it
 		$data = $this->librarian->get($id);
 		
-		if (empty($data[$this->propertyName]) or !is_string($data[$this->propertyName]))
+		if (empty($data[$this->propertyName]))
 			return;
 		
 		$now = time();
+		
+		$parts = parse_url($data[$this->propertyName]);
 		
 		$this->db->insert($this->getTableName(), [
 			'id' => $id,
