@@ -14,7 +14,7 @@
 		}
 	},
 	"require": {
-			"doctrine/dbal": "2.3.4",
+			"doctrine/dbal": "2.3.*",
 			"symfony/event-dispatcher": "2.2.*",
 			"psr/log": "1.*",
 			"barnabywalters/helpers": "0.1.*"
